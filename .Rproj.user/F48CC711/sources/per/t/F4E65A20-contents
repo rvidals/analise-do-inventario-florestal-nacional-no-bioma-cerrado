@@ -1,0 +1,288 @@
+---
+title: "Análise do Inventário Florestal Nacional no Bioma Cerrado"
+author: "Rogerio Vidal de Siqueira"
+date: "`r format(Sys.Date(),'%d/%m/%Y')`"
+---
+
+```{r sets, echo=F, message=FALSE, warning=FALSE}
+
+# PRE-SETS ----
+rm(list=ls()) # limpa  o ambiente de trabalho
+
+
+# PACOTES
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, # pacote para manipulação de dados
+               utils, # pacote base
+               downloader, # pacote para download de arquivos
+               sf, #pacote para manipulação de dados espaciais
+               geobr # pacote para baixar shapefiles do Brasil
+               )
+
+
+#pasta=paste0("Saidas-Exercicios-", Sys.Date()) #cria uma pasta para as saídas do dia
+#if(!dir.exists(pasta)) dir.create(pasta) #cria uma pasta para as saídas do dia
+
+```
+
+# Funções
+
+```{r funcoes, warning=FALSE, show=FALSE}
+download_e_leitura_csv <- function (url, dir, file ) {
+  tempFile <- tempfile()
+  tempDir <- tempdir()
+  
+  download(url, destfile = tempFile)
+  
+  
+  unzip(zipfile = tempFile, exdir = tempDir)
+  
+  caminho_dados <- file.path(tempDir, dir, file)
+  
+  csv <- read_csv2(caminho_dados, locale = locale(encoding = "ISO-8859-1"))
+  
+  # unlink(tempFile)
+  # unlink(tempDir)
+
+}
+
+download_e_leitura_txt <- function (url, file ) {
+tempFile <- tempfile(fileext = ".zip")
+tempDir <- tempdir()
+  
+download(url_taxon, destfile = tempFile, mode = "wb")
+
+unzip(zipfile = tempFile, exdir = tempDir)
+  
+caminho_dados <- file.path(tempDir, file)
+
+df <- read_delim(caminho_dados, delim = "\t", locale = locale(encoding = "UTF-8"))
+
+}
+
+```
+
+## Carregar dados da malha municipal dos municípios que fazem parte da Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)
+
+```{r , warning=FALSE, message=FALSE}
+
+#datasets <- list_geobr() # Lista de datasets disponíveis
+
+lista_mun_RIDE <- c(
+                    "Cristalina", "Águas Lindas de Goiás", "Cabeceiras", 
+                    "Buritis", "Unaí", "Goianésia",
+                    "Alexânia", "Pirenópolis", "Santo Antônio do Descoberto",
+                    "Cavalcante", "Brasília",  "Água Fria de Goiás", 
+                    "Alto Paraíso de Goiás", "Alvorada do Norte", "Cidade Ocidental", 
+                    "Flores de Goiás", "Formosa", "Luziânia",  
+                    "Planaltina", "São João D'aliança", "Simolândia", 
+                    "Valparaíso de Goiás", "Vila Boa", "Arinos", 
+                    "Cabeceira Grande", "Abadiânia",  "Barro Alto", 
+                    "Mimoso de Goiás", "Niquelândia", "Novo Gama", 
+                    "Padre Bernardo", "Cocalzinho de Goiás", "Corumbá de Goiás", 
+                    "Vila Propício" 
+                    )
+
+# Baixar shapefile do Brasil
+mun_ride <- read_municipality(
+    year = 2022,
+  showProgress = FALSE
+  )%>%
+  filter(abbrev_state == "GO" | abbrev_state == "DF"| abbrev_state == "MG") %>%  
+  filter(name_muni %in% lista_mun_RIDE)
+mun_ride
+
+# rm(datasets)
+
+```
+
+## Carregar dados por link
+
+```{r, warning=FALSE, message=FALSE}
+url_socio <- "https://snif.florestal.gov.br/images/dados_abertos/IFN_Bioma_Cerrado_LSA_B3_S2_v1.zip"
+url_bio <- "https://snif.florestal.gov.br/images/dados_abertos/IFN_Bioma_Cerrado_Biofisico_F6_v1.zip"
+
+levantamento_socioambiental <- download_e_leitura_csv(url_socio, "IFN_Bioma_Cerrado_LSA_B3_S2_v1.1", "dados IFN-LSA Cerrado plantas mais utilizadas.csv")
+
+levantamento_biofisio <- download_e_leitura_csv(url_bio, "IFN_Bioma_Cerrado_Biofisico_F6_v1.1", "dados IFN- Bioma Cerrado Biofisico F6 v.1.1.csv")
+
+```
+
+## TRATAMENTO DE DADOS DO IFN
+
+```{r, warning=FALSE, message=FALSE}
+# Filtrar somente os dados que possuem coordenadas
+tab_soc <- levantamento_socioambiental[!is.na(levantamento_socioambiental$LONG) & !is.na(levantamento_socioambiental$LAT),]
+
+tab_bio <- levantamento_biofisio[!is.na(levantamento_biofisio$Long) & !is.na(levantamento_biofisio$Lat),]
+
+# Converter a tabela para um dado espacial
+geo_soc <- tab_soc %>% 
+  st_as_sf(coords = c("LONG", "LAT"), crs = 4326)
+
+geo_bio <- tab_bio %>% 
+  st_as_sf(coords = c("Long", "Lat"), crs = 4326)
+
+
+# Filtrar somente os dados do DF, GO e MG
+
+geo_soc_DFGOMG <- geo_soc %>% 
+  filter(grepl("GO|DF|MG",LOTE))
+
+geo_bio_DFGOMG <- geo_bio %>% 
+  filter(grepl("GO|DF|MG",LOTE))
+
+print(dim(geo_soc_DFGOMG))
+print(dim(geo_bio_DFGOMG))
+
+# Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)
+
+tab_bio_ride <- geo_bio_DFGOMG %>% # Tabela Biofísica do IFN
+  st_transform(crs = 4674) %>%
+  st_join(mun_ride) %>%
+  filter(!is.na(name_muni))
+
+
+tab_socio_ride <- geo_soc_DFGOMG %>% # Tabela Sociológica do IFN
+  st_transform(crs = 4674) %>%
+  st_join(mun_ride) %>%
+  filter(!is.na(name_muni))
+
+# Na coluna TAXON_ID, existem valores que não são numéricos, então é necessário filtrar somente os valores numéricos. Os valores que aparecem são: Em análise, Indivíduo Morto. Como essa coluna é chave primária para juntar com a tabela Taxon, é necessário filtrar somente os valores numéricos.
+
+geo_bio_DFGOMG_filtrado <- geo_bio_DFGOMG %>% 
+  mutate(num_check = as.numeric(TAXON_ID)) %>% # Verificar se é numérico
+  filter(!is.na(num_check)) %>% # Filtrar somente os valores numéricos
+  select(-num_check)
+
+geo_bio_DFGO_filtrado
+
+# rm(tab_taxon_filtrado)
+
+```
+
+```{r}
+# Salvar arquivos
+#st_write(geo_soc_DFGO, "geo_levantamento_socioambiental_limpo_filtro_go.shp", delete_dsn = TRUE)
+```
+
+## Carregar dados de taxon no site do Jardim Botânico do Rio de Janeiro
+
+```{r, warning=FALSE, message=FALSE}
+
+url_taxon <- "https://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil&v=393.403"
+
+tab_taxon <- download_e_leitura_txt(url_taxon, "taxon.txt")
+
+```
+
+## Relacionar os dados bio do IFN com os dados de Taxon
+
+```{r}
+
+tab_taxon <- tab_taxon %>% 
+  mutate(taxonID = as.character(taxonID))
+
+tab_bio_taxon <- geo_bio_DFGOMG_filtrado %>% 
+  left_join(tab_taxon, by = c("TAXON_ID" = "taxonID"))
+
+tab_bio_taxon
+
+```
+
+## Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)
+
+```{r}
+
+tab_bio_taxon_ride <- tab_bio_taxon %>%
+  st_transform(crs = 4674) %>%
+  st_join(mun_ride) %>%
+  filter(!is.na(name_muni))
+
+```
+
+# Visualizar dados processados e relacionados
+
+```{r}
+
+
+ggplot(tab_bio_taxon_ride) + 
+  geom_sf() +
+  theme_minimal()
+
+
+st_write(tab_bio_socio_taxon_ride, "tab_bio_socio_taxon_ride.shp", delete_dsn = TRUE)
+
+```
+
+## Relação espacial entre os dados Bio do IFN e Sociológicos do IFN
+
+```{r}
+
+tab_bio_socio_taxon_ride <- geo_soc_DFGOMG %>% # Tabela Sociológica do IFN
+  st_transform(crs = 4674) %>% # Transformar o sistema de coordenadas
+  st_join(tab_bio_taxon_ride) %>% # Juntar com a tabela Biofísica + Taxon do IFN
+  filter(!is.na(name_muni)) # Filtrar somente os municípios da RIDE-DF
+
+```
+
+## Quais são os tipos de usos presente na tabela Sociológica?
+
+```{r}
+
+# Tipos de usos da tabela Sociológica 
+tipos_usos <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!PARTE_UTI == 'Sem informação') %>% # Filtrar somente os valores únicos
+  group_by(PARTE_UTI) %>% # Agrupar por município e espécie
+  summarise(Quantidade = n()) %>%# Listar os tipos de uso
+  arrange(desc(Quantidade)) # Ordenar de forma decrescente
+
+```
+
+## Quais são os produtos mais citados na tabela Sociológica?
+
+```{r}
+
+# Produtos mais citados 
+produtos_mais_citados <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  group_by(`NOME DESCRITO NO LSA`) %>% # Agrupar por município e espécie
+  summarise(Quantidade = n()) %>%# Listar os tipos de uso
+  arrange(desc(Quantidade)) %>% # Ordenar de forma decrescente
+  head(20) # Listar os 20 mais citados
+
+
+```
+
+## Quais as espécies mais usadas por município?
+
+```{r}
+
+rm(especie_socio_ride)
+
+especie_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  group_by(name_muni, `NOME DESCRITO NO LSA`) %>% # Agrupar por município e espécie
+  summarise(Quantidade = n()) %>% # Contar a quantidade de espécies
+  arrange(desc(name_muni), desc(Quantidade)) %>% # Ordenar de forma decrescente pela quantidade
+  group_by(name_muni) %>% # Reagrupar por município
+  top_n(5, Quantidade) # Selecionar os 5 maiores valores de cada municípi
+  
+
+# Espacializar
+ggplot(especie_socio_ride) + 
+  geom_sf() +
+  theme_minimal()
+
+# lista_especies_usadas_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+#  distinct(name_muni, `NOME DESCRITO NO LSA`) %>% # Filtrar somente os valores únicos
+#  group_by(name_muni) %>% # Agrupar por município
+#  summarise(especies_listadas = toString(`NOME DESCRITO NO LSA`)) # Listar as espécies
+
+# lista_especies_tipoUso_usadas_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+#  distinct(name_muni, `NOME DESCRITO NO LSA`, PARTE_UTI) %>% # Filtrar somente os valores únicos
+#  group_by(name_muni, `NOME DESCRITO NO LSA`) %>% # Agrupar por município e espécie
+#  summarise(TIPOS_USO = toString(PARTE_UTI)) # Listar os tipos de uso
+
+```

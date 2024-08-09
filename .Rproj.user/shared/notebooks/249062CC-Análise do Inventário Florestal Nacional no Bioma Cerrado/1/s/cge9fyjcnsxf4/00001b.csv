@@ -1,0 +1,9 @@
+"0","especie_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  group_by(name_muni, `NOME DESCRITO NO LSA`) %>% # Agrupar por município e espécie
+  summarise(Quantidade = n()) %>% # Contar a quantidade de espécies
+  arrange(desc(name_muni), desc(Quantidade)) %>% # Ordenar de forma decrescente pela quantidade
+  group_by(name_muni) %>% # Reagrupar por município
+  top_n(5, Quantidade) # Selecionar os 5 maiores valores de cada municípi
+"
+"2","`summarise()` has grouped output by 'name_muni'. You can override using the `.groups` argument."
