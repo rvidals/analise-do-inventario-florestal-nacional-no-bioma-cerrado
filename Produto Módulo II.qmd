@@ -2,6 +2,25 @@
 title: "Análise do Inventário Florestal Nacional no Bioma Cerrado"
 author: "Rogerio Vidal de Siqueira"
 date: "`r format(Sys.Date(),'%d/%m/%Y')`"
+format: docx
+crossref:
+ fig-title: '**Figura**'
+ fig-labels: arabic
+ title-delim: "**-**"
+ tbl-title: '**Tabela**'
+fig-alig: left
+fig-cap-location: top
+tbl-cap-location: top
+tbl-alig: center
+tbl-cap-alig: center
+lang: pt 
+execute: 
+  echo: false
+  warning: false
+  message: false
+  progress: false
+  cache: false
+editor: source
 ---
 
 ```{r sets, echo=F, message=FALSE, warning=FALSE}
@@ -17,18 +36,28 @@ pacman::p_load(tidyverse, # pacote para manipulação de dados
                utils, # pacote base
                downloader, # pacote para download de arquivos
                sf, #pacote para manipulação de dados espaciais
-               geobr # pacote para baixar shapefiles do Brasil
+               geobr, # pacote para baixar shapefiles do Brasil
+               flextable # pacote para criar tabelas
                )
 
 
 #pasta=paste0("Saidas-Exercicios-", Sys.Date()) #cria uma pasta para as saídas do dia
 #if(!dir.exists(pasta)) dir.create(pasta) #cria uma pasta para as saídas do dia
 
+# Ajuste flaxtable das casas decimais
+set_flextable_defaults(
+  digits = 2,
+  decimal.mark = ",",
+  big.mark = ".",
+  na_str = "<na>"
+)
+
 ```
 
-# Funções
 
 ```{r funcoes, warning=FALSE, show=FALSE}
+
+# Função criada para baixar e ler arquivos csv da base de dados do Inventário Florestal Nacional.
 download_e_leitura_csv <- function (url, dir, file ) {
   tempFile <- tempfile()
   tempDir <- tempdir()
@@ -47,6 +76,10 @@ download_e_leitura_csv <- function (url, dir, file ) {
 
 }
 
+
+# Função criada para baixar e ler arquivos txt da base de dados do Jardim Botânico do Rio de Janeiro.
+
+# Essa função não será utilizada nesse script, mas pode ser útil para futuras análises.
 download_e_leitura_txt <- function (url, file ) {
 tempFile <- tempfile(fileext = ".zip")
 tempDir <- tempdir()
@@ -135,8 +168,8 @@ geo_soc_DFGOMG <- geo_soc %>%
 geo_bio_DFGOMG <- geo_bio %>% 
   filter(grepl("GO|DF|MG",LOTE))
 
-print(dim(geo_soc_DFGOMG))
-print(dim(geo_bio_DFGOMG))
+#print(dim(geo_soc_DFGOMG))
+#print(dim(geo_bio_DFGOMG))
 
 # Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)
 
@@ -168,69 +201,11 @@ geo_bio_DFGOMG_filtrado <- geo_bio_DFGOMG %>%
 #st_write(geo_soc_DFGO, "geo_levantamento_socioambiental_limpo_filtro_go.shp", delete_dsn = TRUE)
 ```
 
-## Carregar dados de taxon no site do Jardim Botânico do Rio de Janeiro
-
-```{r, warning=FALSE, message=FALSE}
-
-url_taxon <- "https://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil&v=393.403"
-
-tab_taxon <- download_e_leitura_txt(url_taxon, "taxon.txt")
-
-```
-
-## Relacionar os dados bio do IFN com os dados de Taxon
-
-```{r}
-
-tab_taxon <- tab_taxon %>% 
-  mutate(taxonID = as.character(taxonID))
-
-tab_bio_taxon <- geo_bio_DFGOMG_filtrado %>% 
-  left_join(tab_taxon, by = c("TAXON_ID" = "taxonID"))
-
-tab_bio_taxon
-
-```
-
-## Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)
-
-```{r}
-
-tab_bio_taxon_ride <- tab_bio_taxon %>%
-  st_transform(crs = 4674) %>%
-  st_join(mun_ride) %>%
-  filter(!is.na(name_muni))
-
-```
-
-# Visualizar dados processados e relacionados
-
-```{r}
-
-
-ggplot(tab_bio_taxon_ride) + 
-  geom_sf() +
-  theme_minimal()
-
-
-# st_write(tab_bio_socio_taxon_ride, "tab_bio_socio_taxon_ride.shp", delete_dsn = TRUE)
-
-```
-
-## Relação espacial entre os dados Bio do IFN e Sociológicos do IFN
-
-```{r}
-
-tab_bio_socio_taxon_ride <- geo_soc_DFGOMG %>% # Tabela Sociológica do IFN
-  st_transform(crs = 4674) %>% # Transformar o sistema de coordenadas
-  st_join(tab_bio_taxon_ride) %>% # Juntar com a tabela Biofísica + Taxon do IFN
-  filter(!is.na(name_muni)) # Filtrar somente os municípios da RIDE-DF
-
-```
-
 ## Quais são os tipos de usos presente na tabela Sociológica?
 
 ```{r}
+
+
 
 # Tipos de usos da tabela Sociológica 
 tipos_usos <- tab_socio_ride %>% # Tabela Sociológica do IFN
@@ -238,6 +213,23 @@ tipos_usos <- tab_socio_ride %>% # Tabela Sociológica do IFN
   group_by(PARTE_UTI) %>% # Agrupar por município e espécie
   summarise(Quantidade = n()) %>%# Listar os tipos de uso
   arrange(desc(Quantidade)) # Ordenar de forma decrescente
+
+
+# Tabela com os tipos de usos
+
+tabela_usos <- tipos_usos %>% 
+  st_drop_geometry() %>%
+  flextable() %>%
+  set_header_labels(
+    PARTE_UTI = "Tipos de Usos",
+    Quantidade = "Quantidade de Usos"
+  ) %>%
+    bold(j = 2,
+       i = c(1, 2)) %>%
+  width( j = 1, width = 1.5) %>%
+  width( j = 2, width = 1)
+  
+tabela_usos
 
 ```
 
