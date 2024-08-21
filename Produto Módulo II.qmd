@@ -57,6 +57,8 @@ set_flextable_defaults(
 
 ```{r funcoes, warning=FALSE, show=FALSE}
 
+#| echo: false
+
 # Função criada para baixar e ler arquivos csv da base de dados do Inventário Florestal Nacional.
 download_e_leitura_csv <- function (url, dir, file ) {
   tempFile <- tempfile()
@@ -96,9 +98,12 @@ df <- read_delim(caminho_dados, delim = "\t", locale = locale(encoding = "UTF-8"
 
 ```
 
+
+```{r dados-malha-municipal, warning=FALSE, message=FALSE}
+
 ## Carregar dados da malha municipal dos municípios que fazem parte da Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)
 
-```{r , warning=FALSE, message=FALSE}
+#| echo: false
 
 #datasets <- list_geobr() # Lista de datasets disponíveis
 
@@ -132,9 +137,14 @@ mun_ride <- read_municipality(
 
 ```
 
+
+
+```{r carregar-dados-web, warning=FALSE, message=FALSE}
+
 ## Carregar dados por link
 
-```{r, warning=FALSE, message=FALSE}
+#| echo: false
+
 url_socio <- "https://snif.florestal.gov.br/images/dados_abertos/IFN_Bioma_Cerrado_LSA_B3_S2_v1.zip"
 url_bio <- "https://snif.florestal.gov.br/images/dados_abertos/IFN_Bioma_Cerrado_Biofisico_F6_v1.zip"
 
@@ -144,9 +154,15 @@ levantamento_biofisio <- download_e_leitura_csv(url_bio, "IFN_Bioma_Cerrado_Biof
 
 ```
 
+
+
+```{r tratamento-dados-ifn, warning=FALSE, message=FALSE}
+
+#| echo: false
+
 ## TRATAMENTO DE DADOS DO IFN
 
-```{r, warning=FALSE, message=FALSE}
+
 # Filtrar somente os dados que possuem coordenadas
 tab_soc <- levantamento_socioambiental[!is.na(levantamento_socioambiental$LONG) & !is.na(levantamento_socioambiental$LAT),]
 
@@ -196,16 +212,17 @@ geo_bio_DFGOMG_filtrado <- geo_bio_DFGOMG %>%
 
 ```
 
-```{r}
+```{r salvar-arquivo-shp}
 # Salvar arquivos
 #st_write(geo_soc_DFGO, "geo_levantamento_socioambiental_limpo_filtro_go.shp", delete_dsn = TRUE)
 ```
 
+
 ## Quais são os tipos de usos presente na tabela Sociológica?
 
-```{r}
+```{r analise-sociologica-produtos}
 
-
+#| echo: false
 
 # Tipos de usos da tabela Sociológica 
 tipos_usos <- tab_socio_ride %>% # Tabela Sociológica do IFN
@@ -224,18 +241,21 @@ tabela_usos <- tipos_usos %>%
     PARTE_UTI = "Tipos de Usos",
     Quantidade = "Quantidade de Usos"
   ) %>%
-    bold(j = 2,
-       i = c(1, 2)) %>%
+  bold(part="header") %>%
+  bold(j = c(1:2),
+       i = c(1:3)) %>%
   width( j = 1, width = 1.5) %>%
-  width( j = 2, width = 1)
+  width( j = 2, width = 1.5)
   
 tabela_usos
 
 ```
 
-## Quais são os produtos mais citados na tabela Sociológica?
 
-```{r}
+## Quais são os produtos mais citados na tabela Sociológica?
+```{r analise-sociologica-produtos-mais-citados}
+
+#| echo: false
 
 # Produtos mais citados 
 produtos_mais_citados <- tab_socio_ride %>% # Tabela Sociológica do IFN
@@ -245,12 +265,32 @@ produtos_mais_citados <- tab_socio_ride %>% # Tabela Sociológica do IFN
   arrange(desc(Quantidade)) %>% # Ordenar de forma decrescente
   head(20) # Listar os 20 mais citados
 
+tabela_produtos_mais_citados <- produtos_mais_citados %>% 
+  st_drop_geometry() %>%
+  flextable() %>%
+  set_header_labels(
+    `NOME DESCRITO NO LSA` = "Nome do Produto",
+    Quantidade = "Quantidade de Usos"
+  ) %>%
+  bold(part="header") %>%
+  bold(j = c(1:2),
+       i = c(1:5)) %>%
+  width( j = 1, width = 1.5) %>%
+  width( j = 2, width = 1.5) %>%
+  bg( bg = "lightblue", i = 1:5) %>%
+  add_footer_lines(
+    "Estão destacados os cinco produtos mais citados na tabela Sociológica do IFN."
+  )
+  
+tabela_produtos_mais_citados
 
 ```
 
-## Quais as espécies mais usadas por município?
+## Quais a espécie mais usadas por município?
 
-```{r}
+```{r analise-sociologica-especies-mais-usadas-municipio}
+
+#| echo: false
 
 rm(especie_socio_ride)
 
@@ -260,22 +300,23 @@ especie_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
   summarise(Quantidade = n()) %>% # Contar a quantidade de espécies
   arrange(desc(name_muni), desc(Quantidade)) %>% # Ordenar de forma decrescente pela quantidade
   group_by(name_muni) %>% # Reagrupar por município
-  top_n(5, Quantidade) # Selecionar os 5 maiores valores de cada municípi
+  top_n(1, Quantidade) # Selecionar os 1 maiores valores de cada municípi
   
 
-# Espacializar
-ggplot(especie_socio_ride) + 
-  geom_sf() +
-  theme_minimal()
+tabela_especie_socio_ride <- especie_socio_ride %>% 
+  st_drop_geometry() %>%
+  flextable() %>%
+  set_header_labels(
+    name_muni = "Município",
+    `NOME DESCRITO NO LSA` = "Nome do Produto",
+    Quantidade = "Quantidade de Usos"
+  ) %>%
+  width( j = 1, width = 2) %>%
+  width( j = 2, width = 1) %>%
+  width( j = 3, width = 1.5) %>%
+  theme_vanilla()
+  
+tabela_especie_socio_ride
 
-# lista_especies_usadas_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
-#  distinct(name_muni, `NOME DESCRITO NO LSA`) %>% # Filtrar somente os valores únicos
-#  group_by(name_muni) %>% # Agrupar por município
-#  summarise(especies_listadas = toString(`NOME DESCRITO NO LSA`)) # Listar as espécies
-
-# lista_especies_tipoUso_usadas_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
-#  distinct(name_muni, `NOME DESCRITO NO LSA`, PARTE_UTI) %>% # Filtrar somente os valores únicos
-#  group_by(name_muni, `NOME DESCRITO NO LSA`) %>% # Agrupar por município e espécie
-#  summarise(TIPOS_USO = toString(PARTE_UTI)) # Listar os tipos de uso
 
 ```
