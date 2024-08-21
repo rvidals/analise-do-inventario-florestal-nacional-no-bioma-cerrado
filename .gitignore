@@ -4,3 +4,5 @@ TABELAS/
 *.prj
 *.shx
 .Rproj.user
+
+/.quarto/
