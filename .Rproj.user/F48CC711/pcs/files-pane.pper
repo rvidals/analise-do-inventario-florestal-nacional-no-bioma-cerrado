@@ -3,6 +3,10 @@
         {
             "columnIndex": 2,
             "ascending": true
+        },
+        {
+            "columnIndex": 3,
+            "ascending": true
         }
     ],
     "path": "~/DEMANDAS/Análise do Inventário Florestal Nacional no Bioma Cerrado"

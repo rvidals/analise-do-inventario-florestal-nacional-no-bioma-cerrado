@@ -3,6 +3,7 @@ TABELAS/
 *.dbf
 *.prj
 *.shx
+*.gpkg
 .Rproj.user
 
 /.quarto/
