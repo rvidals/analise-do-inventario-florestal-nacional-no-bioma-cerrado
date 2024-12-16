@@ -14,6 +14,7 @@ rm(list=ls()) # limpa  o ambiente de trabalho
 
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, # pacote para manipulação de dados
+               rio, # pacote para importar e exportar dados
                utils, # pacote base
                downloader, # pacote para download de arquivos
                sf, #pacote para manipulação de dados espaciais
@@ -21,46 +22,11 @@ pacman::p_load(tidyverse, # pacote para manipulação de dados
                flextable # pacote para criar tabelas
                )
 
+# Carregar funções 
+source("util/funcoes.R")
 
 #pasta=paste0("Saidas-Exercicios-", Sys.Date()) #cria uma pasta para as saídas do dia
 #if(!dir.exists(pasta)) dir.create(pasta) #cria uma pasta para as saídas do dia
-
-```
-
-# Funções
-
-```{r funcoes, warning=FALSE, show=FALSE}
-download_e_leitura_csv <- function (url, dir, file ) {
-  tempFile <- tempfile()
-  tempDir <- tempdir()
-  
-  download(url, destfile = tempFile)
-  
-  
-  unzip(zipfile = tempFile, exdir = tempDir)
-  
-  caminho_dados <- file.path(tempDir, dir, file)
-  
-  csv <- read_csv2(caminho_dados, locale = locale(encoding = "ISO-8859-1"))
-  
-  # unlink(tempFile)
-  # unlink(tempDir)
-
-}
-
-download_e_leitura_txt <- function (url, file ) {
-tempFile <- tempfile(fileext = ".zip")
-tempDir <- tempdir()
-  
-download(url_taxon, destfile = tempFile, mode = "wb")
-
-unzip(zipfile = tempFile, exdir = tempDir)
-  
-caminho_dados <- file.path(tempDir, file)
-
-df <- read_delim(caminho_dados, delim = "\t", locale = locale(encoding = "UTF-8"))
-
-}
 
 ```
 
@@ -93,20 +59,12 @@ mun_ride <- read_municipality(
   filter(abbrev_state == "GO" | abbrev_state == "DF"| abbrev_state == "MG") %>%  
   filter(name_muni %in% lista_mun_RIDE)
 
-# Mostrar os domicílio
-# mun_ride
 
-# rm(datasets)
-
-```
-
-```{r}
 # Exportar os municípios em um arquivo vetorial (GeoPackage)
 
-st_write(mun_ride, "municipios-censo-2022-RIDE.gpkg", delete_dsn = TRUE, driver = "GPKG")
+# st_write(mun_ride, "municipios-censo-2022-RIDE.gpkg", delete_dsn = TRUE, driver = "GPKG")
 
 ```
-
 
 ## Carregar dados o Inventário Florestal NAcional por link
 
@@ -155,14 +113,14 @@ levantamento_socioambiental <- levantamento_socioambiental %>%
 
 ```{r}
 
-levantamento_biofisio[!is.na(levantamento_biofisio$Long) & !is.na(levantamento_biofisio$Lat),]  %>%
-  st_as_sf(coords = c("Long", "Lat"), crs = 4326) %>%
-  st_write("levantamento-biofisio.gpkg", delete_dsn = TRUE, driver = "GPKG")
+# levantamento_biofisio[!is.na(levantamento_biofisio$Long) & !is.na(levantamento_biofisio$Lat),]  %>%
+#   st_as_sf(coords = c("Long", "Lat"), crs = 4326) %>%
+#   st_write("levantamento-biofisio.gpkg", delete_dsn = TRUE, driver = "GPKG")
 
 
-levantamento_socioambiental[!is.na(levantamento_socioambiental$LONG) & !is.na(levantamento_socioambiental$LAT),]  %>%
-  st_as_sf(coords = c("LONG", "LAT"), crs = 4326) %>%
-  st_write("levantamento-socioambiental.gpkg", delete_dsn = TRUE, driver = "GPKG")
+# levantamento_socioambiental[!is.na(levantamento_socioambiental$LONG) & !is.na(levantamento_socioambiental$LAT),]  %>%
+#   st_as_sf(coords = c("LONG", "LAT"), crs = 4326) %>%
+#   st_write("levantamento-socioambiental.gpkg", delete_dsn = TRUE, driver = "GPKG")
 
 ```
 
@@ -243,22 +201,21 @@ tab_taxon <- tab_taxon %>%
 tab_bio_taxon <- geo_bio_DFGOMG_filtrado %>% 
   left_join(tab_taxon, by = c("TAXON_ID" = "taxonID"))
 
-tab_bio_taxon |> View()
+tab_bio_taxon
 
 ```
 
 ## Verificar a altura (HT) das 10 espécies mais altas
 
-```{r}  
+```{r}
 
 tab_bio_taxon %>% 
   arrange(desc(HT)) %>%
-  head(10) %>%
-  View()
+  head(10) 
 
 ```
 
-## Distribuir a alturas das espécies 
+## Distribuir a alturas das espécies
 
 ```{r}
 
@@ -273,15 +230,38 @@ tab_bio_taxon %>%
     y = "Frequência"
   )
 
-``` 
+```
+
+## Listar municípios que não foram contemplados pelo IFN
+
+```{r}
+
+# Biofísico
+mun_bio_sem_dados_IFN <- mun_ride %>%
+  filter(!name_muni %in% tab_bio_ride$name_muni) %>%
+  select(name_muni, name_state) %>% 
+  st_drop_geometry()
+
+mun_bio_sem_dados_IFN
+
+# Sociológico
+mun_socio_sem_dados_IFN <- mun_ride %>%
+  filter(!name_muni %in% tab_socio_ride$name_muni) %>%
+  select(name_muni, name_state) %>%
+  st_drop_geometry()
+
+mun_socio_sem_dados_IFN
+
+```
+
 
 ## Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)
 
 ```{r}
 
 tab_bio_taxon_ride <- tab_bio_taxon %>%
-  st_transform(crs = 4674) %>%
-  st_join(mun_ride) %>%
+  st_transform(crs = 4674) %>% # Transformar o sistema de coordenadas
+  st_join(mun_ride) %>% # Juntar com a tabela de municípios da RIDE-DF e obter o nome do município
   filter(!is.na(name_muni))
 
 ```
@@ -295,50 +275,50 @@ ggplot(tab_bio_taxon_ride) +
   geom_sf() +
   theme_minimal()
 
-
 # st_write(tab_bio_taxon_ride, "tab_bio_taxon_ride.gpkg", delete_dsn = TRUE)
-
 ```
 
-## Relação espacial entre os dados Bio do IFN e Sociológicos do IFN (Comentado)
+## Relação espacial entre os dados Biofísico + Taxon do IFN e Sociológicos do IFN (Comentado)
 
 ```{r}
 
-tab_bio_socio_taxon_ride <- geo_soc_DFGOMG %>% # Tabela Sociológica do IFN
-  st_transform(crs = 4674) %>% # Transformar o sistema de coordenadas
-  st_join(tab_bio_taxon_ride) %>% # Juntar com a tabela Biofísica + Taxon do IFN
-  filter(!is.na(name_muni)) # Filtrar somente os municípios da RIDE-DF
-
-
-tab_bio_taxon_ride_1 <- tab_bio_taxon_ride %>%
-  mutate(
-    Long = st_coordinates(geometry)[,1],  # Longitude
-    Lat = st_coordinates(geometry)[,2]   # Latitude
-  ) %>%
-  st_drop_geometry() # por não identificar números iguais, mas com arredondamento distinto
-
-geo_soc_DFGOMG_1 <- geo_soc_DFGOMG %>%
-    mutate(
-         Long = st_coordinates(geometry)[,1],  # Igualmente, para evitar que não junte as colunas
-         Lat = st_coordinates(geometry)[,2]
-      ) %>%
-  st_drop_geometry() # por não identificar números iguais, mas com arredondamento distinto
-
-
-tabela_biofisico_taxon_inf_LSA <-
-  tab_bio_taxon_ride_1 %>%
-  left_join(
-    geo_soc_DFGOMG_1 %>%
-    st_drop_geometry()    ,
-    by = join_by(LOTE,
-                 Long == Long,
-                 Lat ==  Lat),
-    relationship = "many-to-many"  # Afirmação para evitar o aviso de que há mais de um valor
-  )
+# tab_bio_socio_taxon_ride <- geo_soc_DFGOMG %>% # Tabela Sociológica do IFN
+#   st_transform(crs = 4674) %>% # Transformar o sistema de coordenadas
+#   st_join(tab_bio_taxon_ride) %>% # Juntar com a tabela Biofísica + Taxon do IFN
+#   filter(!is.na(name_muni)) # Filtrar somente os municípios da RIDE-DF
+# 
+# 
+# tab_bio_taxon_ride_1 <- tab_bio_taxon_ride %>%
+#   mutate(
+#     Long = st_coordinates(geometry)[,1],  # Longitude
+#     Lat = st_coordinates(geometry)[,2]   # Latitude
+#   ) %>%
+#   st_drop_geometry() # por não identificar números iguais, mas com arredondamento distinto
+# 
+# geo_soc_DFGOMG_1 <- geo_soc_DFGOMG %>%
+#     mutate(
+#          Long = st_coordinates(geometry)[,1],  # Igualmente, para evitar que não junte as colunas
+#          Lat = st_coordinates(geometry)[,2]
+#       ) %>%
+#   st_drop_geometry() # por não identificar números iguais, mas com arredondamento distinto
+# 
+# 
+# tabela_biofisico_taxon_inf_LSA <-
+#   tab_bio_taxon_ride_1 %>%
+#   left_join(
+#     geo_soc_DFGOMG_1 %>%
+#     st_drop_geometry()    ,
+#     by = join_by(LOTE,
+#                  Long == Long,
+#                  Lat ==  Lat),
+#     relationship = "many-to-many"  # Afirmação para evitar o aviso de que há mais de um valor
+#   )
 
 ```
 
-## Quais são os tipos de usos presente na tabela Biofísico?
+# TABELA BIOFÍSICO 
+
+## Frequencia de espécies na tabela Biofísico. 
 
 ```{r}
 
@@ -347,13 +327,12 @@ registros_bio <- tab_bio_taxon_ride %>% # Tabela Sociológica do IFN
   filter(!is.na(scientificName)) %>% # Filtrar somente os valores únicos
   group_by(scientificName) %>% # Agrupar por município e espécie
   summarise(Quantidade = n()) %>%# Listar os tipos de uso
-  arrange(desc(Quantidade)) # Ordenar de forma decrescente
+  arrange(desc(Quantidade)) %>% # Ordenar de forma decrescente
+  head(30) # Listar os 30 mais citados
 
 
 # Total de Registros
 sum(registros_bio$Quantidade)
-
-
 
 # Tabela com os tipos de usos
 
@@ -362,20 +341,24 @@ flex_registros_bio <- registros_bio %>%
   flextable() %>%
   set_header_labels(
     scientificName = "Nome Científico",
-    Quantidade = "Quantidade"
+    Quantidade = "Quantidade de Registros"
   )  %>%
   bold(part="header") %>%
   bold(j = c(1:2),
        i = c(1:5)) %>%
   width( j = 1, width = 1.5) %>%
-  width( j = 2, width = 1.5)
+  width( j = 2, width = 1.5) %>%
+  add_footer_lines(
+    "Estão destacados as 30 espécies mais registranas na tabela Biofísica do IFN."
+  )
   
 flex_registros_bio
 
 ```
 
+# TABELA SOCIOLÓGICA
 
-## Quais são os tipos de usos presente na tabela Sociológica?
+## Tipos de usos presente na tabela Sociológica
 
 ```{r}
 
@@ -406,18 +389,8 @@ flex_tabela_usos
 
 ```
 
-```{r}
-tab_bio_taxon_ride %>%
-  filter(scientificName == "Birsonima pachyphylla")
-
-```
-
-
 ## Quais são os produtos mais citados na tabela Sociológica?
-
 ```{r}
-
-
 # Produtos mais citados 
 produtos_mais_citados <- tab_socio_ride %>% # Tabela Sociológica do IFN
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
@@ -447,21 +420,22 @@ tabela_produtos_mais_citados
 
 ```
 
-## Quais a espécie mais usadas por município?
 
+## Quais a espécie mais usadas por município?
 
 ```{r analise-sociologica-especies-mais-usadas-municipio}
 
 #| echo: false
+#| 
 
 especie_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
-  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores válidos
   group_by(name_muni, `NOME DESCRITO NO LSA`) %>% # Agrupar por município e espécie
-  summarise(Quantidade = n()) %>% # Contar a quantidade de espécies
+  summarise(Quantidade = n(), .groups = 'drop') %>% # Contar a quantidade de espécies
   arrange(desc(name_muni), desc(Quantidade)) %>% # Ordenar de forma decrescente pela quantidade
   group_by(name_muni) %>% # Reagrupar por município
   top_n(1, Quantidade) # Selecionar os 1 maiores valores de cada município
-  
+
 
 tabela_especie_socio_ride <- especie_socio_ride %>% 
   st_drop_geometry() %>%
@@ -469,7 +443,7 @@ tabela_especie_socio_ride <- especie_socio_ride %>%
   set_header_labels(
     name_muni = "Município",
     `NOME DESCRITO NO LSA` = "Nome do Produto",
-    Quantidade = "Quantidade de Usos"
+    Quantidade = "Frequência de Respostas"
   ) %>%
   width( j = 1, width = 2) %>%
   width( j = 2, width = 1) %>%
@@ -477,6 +451,116 @@ tabela_especie_socio_ride <- especie_socio_ride %>%
   theme_vanilla()
   
 tabela_especie_socio_ride
+```
+
+# PRODUTOS SELECIONADOS (Tabela Biofísica)
+
+## Selecionar algumas espécies de produtos florestais não madeireiros (PFNM) do Cerrado
+```{r}
+
+# Importa os dados de um arquivo CSV chamado "Especies de PFNM do Cerrado.csv" 
+# e os armazena no objeto 'produtos'.
+produtos <- import("Especies de PFNM do Cerrado.csv")
+
+# Processa os dados para criar uma lista de nomes científicos únicos.
+lista_produtos <- produtos %>%
+  filter(!is.na(Nome_Cientifico)) %>%  # Filtra as linhas onde 'Nome_Cientifico' não é NA.
+  pull(Nome_Cientifico) %>%            # Extrai os valores da coluna 'Nome_Cientifico' como um vetor.
+  strsplit(" ", fixed = TRUE) %>%      # Divide cada nome científico no espaço (resultado é uma lista).
+  sapply(`[[`, 1)                      # Extrai a primeira palavra (gênero) de cada nome científico.
+
+# Exibe o vetor 'lista_produtos' em uma janela interativa para visualização.
+lista_produtos
+
+# Cria uma expressão regular com os gêneros separados por "|",
+# permitindo buscar qualquer um desses gêneros no próximo passo.
+padrao <- paste(lista_produtos, collapse = "|")
+
+# Filtra as linhas do data frame 'tab_bio_taxon_ride'
+# que contêm algum dos gêneros em 'padrao' na coluna 'scientificName'.
+produtos_bio_ride <- tab_bio_taxon_ride %>%
+  filter(str_detect(scientificName, padrao))
+
+# st_write(produtos_bio_ride, "produtos_bio_ride.gpkg", delete_dsn = TRUE, driver = "GPKG")
+```
+
+## Quais as espécies (produtos) mais usados ?
+
+```{r}
+
+# Nomes Populares 
+df_produtos_nome_populares <- produtos %>% 
+  mutate(
+    genero = strsplit(Nome_Cientifico, " ", fixed = TRUE) %>% sapply(`[[`, 1)
+  )
+
+# Produtos mais citados 
+produtos_bio_mais_citados <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+  group_by(scientificName) %>% # Agrupar por município e espécie
+  summarise(Quantidade = n()) %>%# Listar os tipos de uso
+  arrange(desc(Quantidade)) %>% # Ordenar de forma decrescente
+  mutate(
+    Nome_Popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+  head(20) # Listar os 20 mais citados
+
+# Tabela
+tabela_produtos_bio_mais_citados <- produtos_bio_mais_citados %>% 
+  st_drop_geometry() %>%
+  select(scientificName, Nome_Popular, Quantidade) %>%
+  flextable() %>%
+  set_header_labels(
+    scientificName = "Nome Científico",
+    Nome_Popular = "Nome Popular",
+    Quantidade = "Frequência de Repostas"
+  ) %>%
+  bold(part="header") %>%
+  bold(j = c(1:2),
+       i = c(1:5)) %>%
+  width( j = 1, width = 1.5) %>%
+  width( j = 2, width = 1.5) %>%
+  # bg( bg = "lightblue", i = 1:5) %>%
+  add_footer_lines(
+    "Foi realizada uma seleção inicial de 29 espécies, e com base nessa seleção, as 20 espécies mais citadas (tab. Biofísica IFN) estão destacadas nesta tabela."
+  )
+
+tabela_produtos_bio_mais_citados
+```
 
 
+## Quais as espécies (produtos) mais usadas por município?
+
+```{r}
+
+# Produtos mais citados 
+produtos_bio_mais_citados_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+  group_by(name_muni, scientificName) %>% # Agrupar por município e espécie
+  summarise(Quantidade = n(), .groups = 'drop') %>% # Contar a quantidade de espécies
+  arrange(desc(name_muni), desc(Quantidade)) %>% # Ordenar de forma decrescente pela quantidade
+  group_by(name_muni) %>% # Reagrupar por município
+  # mutate(
+  #   Nome_Popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  #       ) %>%
+  top_n(1, Quantidade) # Selecionar os 1 maiores valores de cada município
+
+
+# Tabela
+tabela_produtos_bio_mais_citados_ride <- produtos_bio_mais_citados_ride %>% 
+  st_drop_geometry() %>%
+  flextable() %>%
+  set_header_labels(
+    scientificName = "Nome do Produto",
+    Quantidade = "Frequencia do Produto"
+  ) %>%
+  bold(part="header") %>%
+  bold(j = c(1:2),
+       i = c(1:5)) %>%
+  width( j = 1, width = 1.5) %>%
+  width( j = 2, width = 1.5) %>%
+  # bg( bg = "lightblue", i = 1:5) %>%
+  add_footer_lines(
+    "Foi realizada uma seleção prévia de 29 espécies, e com base nessa seleção, as mais citadas (tab. Biofísica) por município estão contidas nessa tabela."
+  )
+
+tabela_produtos_bio_mais_citados_ride
 ```
