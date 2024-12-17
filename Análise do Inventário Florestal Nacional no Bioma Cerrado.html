@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.554">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Rogerio Vidal de Siqueira">
+<meta name="dcterms.date" content="2025-05-12">
+
+<title>Análise do Inventário Florestal Nacional no Bioma Cerrado</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/quarto-html/quarto.js"></script>
+<script src="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/quarto-html/popper.min.js"></script>
+<script src="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+
+<script src="Análise do Inventário Florestal Nacional no Bioma Cerrado_files/libs/tabwid-1.1.3/tabwid.js"></script>
+
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Análise do Inventário Florestal Nacional no Bioma Cerrado</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Rogerio Vidal de Siqueira </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 12, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PRE-SETS ----</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>()) <span class="co"># limpa  o ambiente de trabalho</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># PACOTES</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"pacman"</span>)) <span class="fu">install.packages</span>(<span class="st">"pacman"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, <span class="co"># pacote para manipulação de dados</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>               rio, <span class="co"># pacote para importar e exportar dados</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>               utils, <span class="co"># pacote base</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>               downloader, <span class="co"># pacote para download de arquivos</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>               sf, <span class="co">#pacote para manipulação de dados espaciais</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>               geobr, <span class="co"># pacote para baixar shapefiles do Brasil</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>               flextable, <span class="co"># pacote para criar tabelas</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>               patchwork, <span class="co"># pacote para criar relatórios</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>               ggpattern <span class="co"># pacote para criar padrões</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>               )</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Carregar funções </span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"util/funcoes.R"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">#pasta=paste0("Saidas-Exercicios-", Sys.Date()) #cria uma pasta para as saídas do dia</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">#if(!dir.exists(pasta)) dir.create(pasta) #cria uma pasta para as saídas do dia</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="carregar-dados-da-malha-municipal-dos-municípios-que-fazem-parte-da-região-integrada-de-desenvolvimento-do-distrito-federal-e-entorno-ride-df" class="level2">
+<h2 class="anchored" data-anchor-id="carregar-dados-da-malha-municipal-dos-municípios-que-fazem-parte-da-região-integrada-de-desenvolvimento-do-distrito-federal-e-entorno-ride-df">Carregar dados da malha municipal dos municípios que fazem parte da Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#datasets &lt;- list_geobr() # Lista de datasets disponíveis</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>lista_mun_RIDE <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Cristalina"</span>, <span class="st">"Águas Lindas de Goiás"</span>, <span class="st">"Cabeceiras"</span>, </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Buritis"</span>, <span class="st">"Unaí"</span>, <span class="st">"Goianésia"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Alexânia"</span>, <span class="st">"Pirenópolis"</span>, <span class="st">"Santo Antônio do Descoberto"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Cavalcante"</span>, <span class="st">"Brasília"</span>,  <span class="st">"Água Fria de Goiás"</span>, </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Alto Paraíso de Goiás"</span>, <span class="st">"Alvorada do Norte"</span>, <span class="st">"Cidade Ocidental"</span>, </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Flores de Goiás"</span>, <span class="st">"Formosa"</span>, <span class="st">"Luziânia"</span>,  </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Planaltina"</span>, <span class="st">"São João D'aliança"</span>, <span class="st">"Simolândia"</span>, </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Valparaíso de Goiás"</span>, <span class="st">"Vila Boa"</span>, <span class="st">"Arinos"</span>, </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Cabeceira Grande"</span>, <span class="st">"Abadiânia"</span>,  <span class="st">"Barro Alto"</span>, </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Mimoso de Goiás"</span>, <span class="st">"Niquelândia"</span>, <span class="st">"Novo Gama"</span>, </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Padre Bernardo"</span>, <span class="st">"Cocalzinho de Goiás"</span>, <span class="st">"Corumbá de Goiás"</span>, </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Vila Propício"</span> </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Baixar shapefile do Brasil</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>mun_ride <span class="ot">&lt;-</span> <span class="fu">read_municipality</span>(</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="dv">2022</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">showProgress =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">%&gt;%</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(abbrev_state <span class="sc">==</span> <span class="st">"GO"</span> <span class="sc">|</span> abbrev_state <span class="sc">==</span> <span class="st">"DF"</span><span class="sc">|</span> abbrev_state <span class="sc">==</span> <span class="st">"MG"</span>) <span class="sc">%&gt;%</span>  </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(name_muni <span class="sc">%in%</span> lista_mun_RIDE)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Exportar os municípios em um arquivo vetorial (GeoPackage)</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># st_write(mun_ride, "municipios-censo-2022-RIDE.gpkg", delete_dsn = TRUE, driver = "GPKG")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="carregar-dados-o-inventário-florestal-nacional-por-link" class="level2">
+<h2 class="anchored" data-anchor-id="carregar-dados-o-inventário-florestal-nacional-por-link">Carregar dados o Inventário Florestal NAcional por link</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>url_socio <span class="ot">&lt;-</span> <span class="st">"https://snif.florestal.gov.br/images/dados_abertos/IFN_Bioma_Cerrado_LSA_B3_S2_v1.zip"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>url_bio <span class="ot">&lt;-</span> <span class="st">"https://snif.florestal.gov.br/images/dados_abertos/IFN_Bioma_Cerrado_Biofisico_F6_v1.zip"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>levantamento_socioambiental <span class="ot">&lt;-</span> <span class="fu">download_e_leitura_csv</span>(url_socio, <span class="st">"IFN_Bioma_Cerrado_LSA_B3_S2_v1.1"</span>, <span class="st">"dados IFN-LSA Cerrado plantas mais utilizadas.csv"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>levantamento_biofisio <span class="ot">&lt;-</span> <span class="fu">download_e_leitura_csv</span>(url_bio, <span class="st">"IFN_Bioma_Cerrado_Biofisico_F6_v1.1"</span>, <span class="st">"dados IFN- Bioma Cerrado Biofisico F6 v.1.1.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="verificar-coordenadas" class="level2">
+<h2 class="anchored" data-anchor-id="verificar-coordenadas">Verificar Coordenadas</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Não pode haver coordenadas positivas</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Levantamento Biofísico</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>levantamento_biofisio <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Long) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Lat)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Lat <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">|</span> Long <span class="sc">&gt;</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,084 × 19
+   LOTE  UA      Long   Lat    SU  SUBP COD_ARV FUSTE TAXON_ID CLASS_ASSOC AFF. 
+   &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;lgl&gt;
+ 1 SP-01 SP_68…  48.3  20.4     1     8      22     1 121163   Identifica… NA   
+ 2 SP-01 SP_68…  48.3  20.4     2     3       6     1 121163   Associada   NA   
+ 3 SP-01 SP_68…  48.3  20.4     2     5       9     1 121163   Associada   NA   
+ 4 SP-01 SP_68…  48.3  20.4     3     3       6     1 121163   Associada   NA   
+ 5 SP-01 SP_68…  48.3  20.4     3    10       9     1 121163   Associada   NA   
+ 6 SP-01 SP_68…  48.3  20.4     4    10      36     1 121163   Associada   NA   
+ 7 SP-01 SP_19…  47.4  21.3     2     3      35     1 5105     Identifica… NA   
+ 8 SP-01 SP_19…  47.4  21.3     2     3      36     1 5105     Associada   NA   
+ 9 SP-01 SP_17…  47.5  21.2     1     1       6     1 1104     Identifica… NA   
+10 SP-01 SP_17…  47.5  21.2     1     5      16     1 1104     Associada   NA   
+# ℹ 2,074 more rows
+# ℹ 8 more variables: CF. &lt;chr&gt;, DAP &lt;dbl&gt;, DB &lt;dbl&gt;, HT &lt;dbl&gt;, HF &lt;dbl&gt;,
+#   SAN &lt;dbl&gt;, HAB &lt;chr&gt;, DATA &lt;chr&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Levantamento Socioambiental</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>levantamento_socioambiental <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(LONG) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(LAT)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(LAT <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">|</span> LONG <span class="sc">&gt;</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 178 × 7
+   LOTE  UA          LONG   LAT LSA   `NOME DESCRITO NO LSA` PARTE_UTI
+   &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;                  &lt;chr&gt;    
+ 1 SP-01 SP_227_P32  47.5  21.4 1     Barbatimão             casca    
+ 2 SP-01 SP_227_P32  47.5  21.4 1     Angico                 casca    
+ 3 SP-01 SP_227_P32  47.5  21.4 1     cipó são joão          folha    
+ 4 SP-01 SP_227_P32  47.5  21.4 1     Bambu                  galho    
+ 5 SP-01 SP_227_P32  47.5  21.4 1     Pequi                  fruto    
+ 6 SP-01 SP_227_P32  47.5  21.4 1     Caroba                 raiz     
+ 7 SP-01 SP_227_P32  47.5  21.4 1     Quina                  raiz     
+ 8 SP-01 SP_227_P32  47.5  21.4 1     carqueijo              folha    
+ 9 SP-01 SP_228_P26  47.4  21.4 1     Eucalipto              tronco   
+10 SP-01 SP_228_P26  47.4  21.4 1     Goiaba                 fruto    
+# ℹ 168 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Corrigir coordenadas positivas para negativas (Lat, Long)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>levantamento_biofisio <span class="ot">&lt;-</span> levantamento_biofisio <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Long =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(Long) <span class="sc">&amp;</span> Long <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">as.numeric</span>(Long) <span class="sc">*</span> <span class="sc">-</span><span class="dv">1</span>, Long), <span class="co"># Multiplicar a longitude por -1</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">Lat =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(Lat) <span class="sc">&amp;</span> Lat <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">as.numeric</span>(Lat) <span class="sc">*</span> <span class="sc">-</span><span class="dv">1</span>, Lat)) <span class="co"># Multiplicar a latitude por -1</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>levantamento_socioambiental <span class="ot">&lt;-</span> levantamento_socioambiental <span class="sc">%&gt;%</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">LONG =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(LONG) <span class="sc">&amp;</span> LONG <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">as.numeric</span>(LONG) <span class="sc">*</span> <span class="sc">-</span><span class="dv">1</span>, LONG), <span class="co"># Multiplicar a longitude por -1</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">LAT =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(LAT) <span class="sc">&amp;</span> LAT <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">as.numeric</span>(LAT) <span class="sc">*</span> <span class="sc">-</span><span class="dv">1</span>, LAT)) <span class="co"># Multiplicar a latitude por -1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="espacializar-lat-long-e-exportar-dados-em-gpkg-para-visualização-no-qgis" class="level2">
+<h2 class="anchored" data-anchor-id="espacializar-lat-long-e-exportar-dados-em-gpkg-para-visualização-no-qgis">Espacializar (Lat, Long) e exportar dados em gpkg para visualização no QGIS</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># levantamento_biofisio[!is.na(levantamento_biofisio$Long) &amp; !is.na(levantamento_biofisio$Lat),]  %&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   st_as_sf(coords = c("Long", "Lat"), crs = 4326) %&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   st_write("levantamento-biofisio.gpkg", delete_dsn = TRUE, driver = "GPKG")</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># levantamento_socioambiental[!is.na(levantamento_socioambiental$LONG) &amp; !is.na(levantamento_socioambiental$LAT),]  %&gt;%</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   st_as_sf(coords = c("LONG", "LAT"), crs = 4326) %&gt;%</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   st_write("levantamento-socioambiental.gpkg", delete_dsn = TRUE, driver = "GPKG")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="tratamento-de-dados-do-ifn" class="level2">
+<h2 class="anchored" data-anchor-id="tratamento-de-dados-do-ifn">TRATAMENTO DE DADOS DO IFN</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtrar somente os dados que possuem coordenadas</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>tab_soc <span class="ot">&lt;-</span> levantamento_socioambiental[<span class="sc">!</span><span class="fu">is.na</span>(levantamento_socioambiental<span class="sc">$</span>LONG) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(levantamento_socioambiental<span class="sc">$</span>LAT),]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>tab_bio <span class="ot">&lt;-</span> levantamento_biofisio[<span class="sc">!</span><span class="fu">is.na</span>(levantamento_biofisio<span class="sc">$</span>Long) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(levantamento_biofisio<span class="sc">$</span>Lat),]</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Converter a tabela para um dado espacial</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>geo_soc <span class="ot">&lt;-</span> tab_soc <span class="sc">%&gt;%</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"LONG"</span>, <span class="st">"LAT"</span>), <span class="at">crs =</span> <span class="dv">4326</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>geo_bio <span class="ot">&lt;-</span> tab_bio <span class="sc">%&gt;%</span> </span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Long"</span>, <span class="st">"Lat"</span>), <span class="at">crs =</span> <span class="dv">4326</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtrar somente os dados do DF, GO e MG</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>geo_soc_DFGOMG <span class="ot">&lt;-</span> geo_soc <span class="sc">%&gt;%</span> </span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"GO|DF|MG"</span>, LOTE))</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>geo_bio_DFGOMG <span class="ot">&lt;-</span> geo_bio <span class="sc">%&gt;%</span> </span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"GO|DF|MG"</span>, LOTE))</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">dim</span>(geo_soc_DFGOMG))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 14211     6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">dim</span>(geo_bio_DFGOMG))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 84331    18</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>tab_bio_ride <span class="ot">&lt;-</span> geo_bio_DFGOMG <span class="sc">%&gt;%</span> <span class="co"># Tabela Biofísica do IFN</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">4674</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_join</span>(mun_ride) <span class="sc">%&gt;%</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(name_muni))</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>tab_socio_ride <span class="ot">&lt;-</span> geo_soc_DFGOMG <span class="sc">%&gt;%</span> <span class="co"># Tabela Sociológica do IFN</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">4674</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_join</span>(mun_ride) <span class="sc">%&gt;%</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(name_muni))</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Na coluna TAXON_ID, existem valores que não são numéricos, então é necessário filtrar somente os valores numéricos. Os valores que aparecem são: Em análise, Indivíduo Morto. Como essa coluna é chave primária para juntar com a tabela Taxon, é necessário filtrar somente os valores numéricos.</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>geo_bio_DFGOMG_filtrado <span class="ot">&lt;-</span> geo_bio_DFGOMG <span class="sc">%&gt;%</span> </span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">num_check =</span> <span class="fu">as.numeric</span>(TAXON_ID)) <span class="sc">%&gt;%</span> <span class="co"># Verificar se é numérico</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(num_check)) <span class="sc">%&gt;%</span> <span class="co"># Filtrar somente os valores numéricos</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>num_check)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co"># rm(tab_taxon_filtrado)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="carregar-dados-de-taxon-no-site-do-jardim-botânico-do-rio-de-janeiro" class="level2">
+<h2 class="anchored" data-anchor-id="carregar-dados-de-taxon-no-site-do-jardim-botânico-do-rio-de-janeiro">Carregar dados de taxon no site do Jardim Botânico do Rio de Janeiro</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>url_taxon <span class="ot">&lt;-</span> <span class="st">"https://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil&amp;v=393.403"</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>tab_taxon <span class="ot">&lt;-</span> <span class="fu">download_e_leitura_txt</span>(url_taxon, <span class="st">"taxon.txt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="relacionar-os-dados-bio-do-ifn-com-os-dados-de-taxon" class="level2">
+<h2 class="anchored" data-anchor-id="relacionar-os-dados-bio-do-ifn-com-os-dados-de-taxon">Relacionar os dados bio do IFN com os dados de Taxon</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>tab_taxon <span class="ot">&lt;-</span> tab_taxon <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">taxonID =</span> <span class="fu">as.character</span>(taxonID))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>tab_bio_taxon <span class="ot">&lt;-</span> geo_bio_DFGOMG_filtrado <span class="sc">%&gt;%</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(tab_taxon, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"TAXON_ID"</span> <span class="ot">=</span> <span class="st">"taxonID"</span>))</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>tab_bio_taxon</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 63198 features and 42 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -53.1 ymin: -19.44 xmax: -42.84 ymax: -12.78
+Geodetic CRS:  WGS 84
+# A tibble: 63,198 × 43
+   LOTE  UA        SU  SUBP COD_ARV FUSTE TAXON_ID CLASS_ASSOC AFF.  CF.     DAP
+   &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;lgl&gt; &lt;chr&gt; &lt;dbl&gt;
+ 1 GO-01 GO_234     1     4      17     1 19705    Identifica… NA    &lt;NA&gt;   16  
+ 2 GO-01 GO_234     1     8      23     1 19705    Associada   NA    &lt;NA&gt;   25  
+ 3 GO-01 GO_234     2     6      10     1 19705    Associada   NA    &lt;NA&gt;   10  
+ 4 GO-01 GO_234     3    10      20     1 19705    Associada   NA    &lt;NA&gt;   13.2
+ 5 GO-01 GO_234     4     3      15     1 19705    Associada   NA    &lt;NA&gt;   10.5
+ 6 GO-01 GO_234     1     1       1     1 16788    Identifica… NA    &lt;NA&gt;    9.6
+ 7 GO-01 GO_234     1     1       8     1 16788    Associada   NA    &lt;NA&gt;   11.1
+ 8 GO-01 GO_234     1     1       9     1 16788    Associada   NA    &lt;NA&gt;    7.7
+ 9 GO-01 GO_234     1     1      12     1 16788    Associada   NA    &lt;NA&gt;   10.8
+10 GO-01 GO_234     1     1      14     1 16788    Associada   NA    &lt;NA&gt;   10.4
+# ℹ 63,188 more rows
+# ℹ 32 more variables: DB &lt;dbl&gt;, HT &lt;dbl&gt;, HF &lt;dbl&gt;, SAN &lt;dbl&gt;, HAB &lt;chr&gt;,
+#   DATA &lt;chr&gt;, geometry &lt;POINT [°]&gt;, id &lt;dbl&gt;, acceptedNameUsageID &lt;dbl&gt;,
+#   parentNameUsageID &lt;dbl&gt;, originalNameUsageID &lt;dbl&gt;, scientificName &lt;chr&gt;,
+#   acceptedNameUsage &lt;chr&gt;, parentNameUsage &lt;chr&gt;, namePublishedIn &lt;chr&gt;,
+#   namePublishedInYear &lt;chr&gt;, higherClassification &lt;chr&gt;, kingdom &lt;chr&gt;,
+#   phylum &lt;chr&gt;, class &lt;chr&gt;, order &lt;chr&gt;, family &lt;chr&gt;, genus &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+</section>
+<section id="verificar-a-altura-ht-das-10-espécies-mais-altas" class="level2">
+<h2 class="anchored" data-anchor-id="verificar-a-altura-ht-das-10-espécies-mais-altas">Verificar a altura (HT) das 10 espécies mais altas</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>tab_bio_taxon <span class="sc">%&gt;%</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(HT)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 10 features and 42 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -49.14 ymin: -18.18 xmax: -48.24 ymax: -16.74
+Geodetic CRS:  WGS 84
+# A tibble: 10 × 43
+   LOTE  UA        SU  SUBP COD_ARV FUSTE TAXON_ID CLASS_ASSOC AFF.  CF.     DAP
+   &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;lgl&gt; &lt;chr&gt; &lt;dbl&gt;
+ 1 GO-02 GO_542     3     9      19     3 614473   Associada   NA    &lt;NA&gt;   54.1
+ 2 GO-02 GO_542     3     9      19     2 614473   Associada   NA    &lt;NA&gt;   55.7
+ 3 GO-02 GO_542     3     9      20     2 614473   Associada   NA    &lt;NA&gt;   41.2
+ 4 GO-02 GO_805     1     9      73     1 614473   Associada   NA    &lt;NA&gt;   21.7
+ 5 GO-02 GO_805     2     3      44     1 614473   Associada   NA    &lt;NA&gt;   22  
+ 6 GO-02 GO_542     3     9      19     1 614473   Associada   NA    &lt;NA&gt;   70  
+ 7 GO-02 GO_805     1     9      79     1 614473   Associada   NA    &lt;NA&gt;   22.3
+ 8 GO-02 GO_542     3     9      20     1 614473   Associada   NA    &lt;NA&gt;   57.3
+ 9 GO-02 GO_805     1     6      42     1 614473   Associada   NA    &lt;NA&gt;   21.3
+10 GO-02 GO_805     1     6      46     1 614473   Associada   NA    &lt;NA&gt;   21  
+# ℹ 32 more variables: DB &lt;dbl&gt;, HT &lt;dbl&gt;, HF &lt;dbl&gt;, SAN &lt;dbl&gt;, HAB &lt;chr&gt;,
+#   DATA &lt;chr&gt;, geometry &lt;POINT [°]&gt;, id &lt;dbl&gt;, acceptedNameUsageID &lt;dbl&gt;,
+#   parentNameUsageID &lt;dbl&gt;, originalNameUsageID &lt;dbl&gt;, scientificName &lt;chr&gt;,
+#   acceptedNameUsage &lt;chr&gt;, parentNameUsage &lt;chr&gt;, namePublishedIn &lt;chr&gt;,
+#   namePublishedInYear &lt;chr&gt;, higherClassification &lt;chr&gt;, kingdom &lt;chr&gt;,
+#   phylum &lt;chr&gt;, class &lt;chr&gt;, order &lt;chr&gt;, family &lt;chr&gt;, genus &lt;chr&gt;,
+#   specificEpithet &lt;chr&gt;, infraspecificEpithet &lt;chr&gt;, taxonRank &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+</section>
+<section id="distribuir-a-alturas-das-espécies" class="level2">
+<h2 class="anchored" data-anchor-id="distribuir-a-alturas-das-espécies">Distribuir a alturas das espécies</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>tab_bio_taxon <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> HT), <span class="at">bins =</span> <span class="dv">30</span>, <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> <span class="fu">mean</span>(HT, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribuição de HT"</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Altura (HT)"</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Frequência"</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Análise-do-Inventário-Florestal-Nacional-no-Bioma-Cerrado_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="listar-municípios-que-não-foram-contemplados-pelo-ifn" class="level2">
+<h2 class="anchored" data-anchor-id="listar-municípios-que-não-foram-contemplados-pelo-ifn">Listar municípios que não foram contemplados pelo IFN</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Biofísico</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>mun_bio_sem_dados_IFN <span class="ot">&lt;-</span> mun_ride <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>name_muni <span class="sc">%in%</span> tab_bio_ride<span class="sc">$</span>name_muni) <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name_muni, name_state) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>mun_bio_sem_dados_IFN</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              name_muni   name_state
+1                Arinos Minas Gerais
+2               Buritis Minas Gerais
+3      Cabeceira Grande Minas Gerais
+4                  Unaí Minas Gerais
+5 Águas Lindas de Goiás        Goiás
+6            Cabeceiras        Goiás
+7      Cidade Ocidental        Goiás
+8             Novo Gama        Goiás
+9   Valparaíso de Goiás        Goiás</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>geo_mun_bio_sem_dados_IFN <span class="ot">&lt;-</span> mun_ride <span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>name_muni <span class="sc">%in%</span> tab_bio_ride<span class="sc">$</span>name_muni) <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name_muni, name_state)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Sociológico</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>mun_socio_sem_dados_IFN <span class="ot">&lt;-</span> mun_ride <span class="sc">%&gt;%</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>name_muni <span class="sc">%in%</span> tab_socio_ride<span class="sc">$</span>name_muni) <span class="sc">%&gt;%</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name_muni, name_state) <span class="sc">%&gt;%</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>mun_socio_sem_dados_IFN</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              name_muni   name_state
+1                Arinos Minas Gerais
+2               Buritis Minas Gerais
+3      Cabeceira Grande Minas Gerais
+4                  Unaí Minas Gerais
+5 Águas Lindas de Goiás        Goiás
+6      Cidade Ocidental        Goiás
+7             Novo Gama        Goiás
+8   Valparaíso de Goiás        Goiás</code></pre>
+</div>
+</div>
+</section>
+<section id="relação-espacial-entre-os-municípios-da-ride-df-e-os-dados-do-ifn-godfmg" class="level2">
+<h2 class="anchored" data-anchor-id="relação-espacial-entre-os-municípios-da-ride-df-e-os-dados-do-ifn-godfmg">Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>tab_bio_taxon_ride <span class="ot">&lt;-</span> tab_bio_taxon <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">4674</span>) <span class="sc">%&gt;%</span> <span class="co"># Transformar o sistema de coordenadas</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_join</span>(mun_ride) <span class="sc">%&gt;%</span> <span class="co"># Juntar com a tabela de municípios da RIDE-DF e obter o nome do município</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(name_muni))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="visualizar-dados-processados-e-relacionados" class="level1">
+<h1>Visualizar dados processados e relacionados</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criação de um mapa combinando os dois objetos</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>map_combinado <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> mun_ride, <span class="at">fill =</span> <span class="st">"gray90"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span> <span class="co"># Camada de municípios</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf_pattern</span>(  <span class="co"># Camada de municípios sem dados</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span> geo_mun_bio_sem_dados_IFN, <span class="at">pattern =</span> <span class="st">"stripe"</span>,           <span class="co"># Tipo de padrão (stripe, crosshatch, etc.)</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">pattern_angle =</span> <span class="dv">45</span>,            <span class="co"># Ângulo das hachuras</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">pattern_density =</span> <span class="fl">0.01</span>,        <span class="co"># Densidade das linhas</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">pattern_spacing =</span> <span class="fl">0.02</span>,        <span class="co"># Espaçamento entre as linhas</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">pattern_size =</span> <span class="fl">0.1</span>,        <span class="co"># Espessura das linhas (bem finas)</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">fill =</span> <span class="st">"gray90"</span>,               <span class="co"># Cor de fundo</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">pattern_color =</span> <span class="st">"black"</span>) <span class="sc">+</span>     <span class="co"># Cor das linhas do padrão</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> tab_bio_taxon_ride, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="co"># Camada de pontos espacializados</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar o mapa</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>map_combinado</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Análise-do-Inventário-Florestal-Nacional-no-Bioma-Cerrado_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="tabela-biofísico" class="level1">
+<h1>TABELA BIOFÍSICO</h1>
+<section id="frequencia-de-espécies-na-tabela-biofísico." class="level2">
+<h2 class="anchored" data-anchor-id="frequencia-de-espécies-na-tabela-biofísico.">Frequencia de espécies na tabela Biofísico.</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tipos de usos da tabela Sociológica </span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>registros_bio <span class="ot">&lt;-</span> tab_bio_taxon_ride <span class="sc">%&gt;%</span> <span class="co"># Tabela Sociológica do IFN</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(scientificName)) <span class="sc">%&gt;%</span> <span class="co"># Filtrar somente os valores únicos</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(scientificName) <span class="sc">%&gt;%</span> <span class="co"># Agrupar por município e espécie</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Quantidade =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span><span class="co"># Listar os tipos de uso</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Quantidade)) <span class="sc">%&gt;%</span> <span class="co"># Ordenar de forma decrescente</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">30</span>) <span class="co"># Listar os 30 mais citados</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Total de Registros</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(registros_bio<span class="sc">$</span>Quantidade)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8248</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabela com os tipos de usos</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>flex_registros_bio <span class="ot">&lt;-</span> registros_bio <span class="sc">%&gt;%</span> </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_header_labels</span>(</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">scientificName =</span> <span class="st">"Nome Científico"</span>,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Quantidade =</span> <span class="st">"Quantidade de Registros"</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  )  <span class="sc">%&gt;%</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bold</span>(<span class="at">part=</span><span class="st">"header"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bold</span>(<span class="at">j =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>),</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">i =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">1</span>, <span class="at">width =</span> <span class="fl">2.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">2</span>, <span class="at">width =</span> <span class="fl">2.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_footer_lines</span>(</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Estão destacados as 30 espécies com mais registros na tabela Biofísica do IFN."</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>flex_registros_bio</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-dcc8d7e4{}.cl-dcc4535e{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-dcc45368{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-dcc62788{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-dcc62792{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-dcc634d0{width:2.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dcc634da{width:2.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dcc634db{width:2.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dcc634e4{width:2.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dcc634e5{width:2.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dcc634ee{width:2.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dcc634f8{width:2.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-dcc8d7e4"><thead><tr style="overflow-wrap:break-word;"><th class="cl-dcc634d0"><p class="cl-dcc62788"><span class="cl-dcc4535e">Nome Científico</span></p></th><th class="cl-dcc634da"><p class="cl-dcc62792"><span class="cl-dcc4535e">Quantidade de Registros</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc4535e">Qualea multiflora Mart.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc4535e">607</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc4535e">Curatella americana L.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc4535e">536</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc4535e">Davilla elliptica A.St.-Hil.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc4535e">506</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc4535e">Qualea parviflora Mart.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc4535e">481</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc4535e">Tapirira guianensis Aubl.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc4535e">436</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Qualea grandiflora Mart.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">430</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Arecaceae Bercht. &amp; J.Presl.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">377</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Astronium fraxinifolium Schott</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">288</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Tachigali rubiginosa (Mart. ex Tul.) Oliveira-Filho</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">282</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Eucalyptus L'Hér.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">278</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Astronium urundeuva (M.Allemão) Engl.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">264</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Calophyllum brasiliense Cambess.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">248</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Protium heptaphyllum (Aubl.) Marchand</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">241</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Miconia ferruginata DC.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">231</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Copaifera langsdorffii Desf.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">229</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Byrsonima pachyphylla A.Juss.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">228</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Byrsonima coccolobifolia Kunth</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">214</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Sclerolobium paniculatum Vogel</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">203</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Bowdichia virgilioides Kunth</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">201</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Kielmeyera coriacea Mart. &amp; Zucc.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">201</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Callisthene mollissima Warm.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">193</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Caryocar brasiliense Cambess.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">191</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Salvertia convallariodora A.St.-Hil.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">180</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Vellozia squamata Pohl</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">177</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Xylopia aromatica (Lam.) Mart.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">176</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Magonia pubescens A.St.-Hil.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">174</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Emmotum nitens (Benth.) Miers</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">172</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Lafoensia pacari A.St.-Hil.</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">172</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634db"><p class="cl-dcc62788"><span class="cl-dcc45368">Vatairea macrocarpa (Benth.) Ducke</span></p></td><td class="cl-dcc634e4"><p class="cl-dcc62792"><span class="cl-dcc45368">170</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dcc634e5"><p class="cl-dcc62788"><span class="cl-dcc45368">Luehea Willd.</span></p></td><td class="cl-dcc634ee"><p class="cl-dcc62792"><span class="cl-dcc45368">162</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-dcc634f8"><p class="cl-dcc62788"><span class="cl-dcc45368">Estão destacados as 30 espécies com mais registros na tabela Biofísica do IFN.</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</section>
+</section>
+<section id="tabela-sociológica" class="level1">
+<h1>TABELA SOCIOLÓGICA</h1>
+<section id="tipos-de-usos-presente-na-tabela-sociológica" class="level2">
+<h2 class="anchored" data-anchor-id="tipos-de-usos-presente-na-tabela-sociológica">Tipos de usos presente na tabela Sociológica</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tipos de usos da tabela Sociológica </span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>tipos_usos <span class="ot">&lt;-</span> tab_socio_ride <span class="sc">%&gt;%</span> <span class="co"># Tabela Sociológica do IFN</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>PARTE_UTI <span class="sc">==</span> <span class="st">'Sem informação'</span>) <span class="sc">%&gt;%</span> <span class="co"># Filtrar somente os valores únicos</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PARTE_UTI) <span class="sc">%&gt;%</span> <span class="co"># Agrupar por município e espécie</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Quantidade =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span><span class="co"># Listar os tipos de uso</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Quantidade)) <span class="co"># Ordenar de forma decrescente</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabela com os tipos de usos</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>flex_tabela_usos <span class="ot">&lt;-</span> tipos_usos <span class="sc">%&gt;%</span> </span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_header_labels</span>(</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">PARTE_UTI =</span> <span class="st">"Tipos de Usos"</span>,</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Quantidade =</span> <span class="st">"Frequência de Repostas"</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bold</span>(<span class="at">part=</span><span class="st">"header"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bold(j = c(1:2), # Negrito na coluna 1 e 2</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>       <span class="co"># i = c(1:3)) %&gt;% # Negrito nas linhas 1, 2 e 3</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">1</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">2</span>, <span class="at">width =</span> <span class="fl">1.5</span>)</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>flex_tabela_usos</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-dce7b466{}.cl-dce38698{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-dce386ac{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-dce54938{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-dce54939{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-dce5546e{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dce55478{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dce55479{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dce5547a{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dce55482{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dce55483{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-dce7b466"><thead><tr style="overflow-wrap:break-word;"><th class="cl-dce5546e"><p class="cl-dce54938"><span class="cl-dce38698">Tipos de Usos</span></p></th><th class="cl-dce55478"><p class="cl-dce54939"><span class="cl-dce38698">Frequência de Repostas</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-dce55479"><p class="cl-dce54938"><span class="cl-dce386ac">fruto</span></p></td><td class="cl-dce5547a"><p class="cl-dce54939"><span class="cl-dce386ac">1,656</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dce55479"><p class="cl-dce54938"><span class="cl-dce386ac">tronco</span></p></td><td class="cl-dce5547a"><p class="cl-dce54939"><span class="cl-dce386ac">666</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dce55479"><p class="cl-dce54938"><span class="cl-dce386ac">casca</span></p></td><td class="cl-dce5547a"><p class="cl-dce54939"><span class="cl-dce386ac">476</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dce55479"><p class="cl-dce54938"><span class="cl-dce386ac">galho</span></p></td><td class="cl-dce5547a"><p class="cl-dce54939"><span class="cl-dce386ac">209</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dce55479"><p class="cl-dce54938"><span class="cl-dce386ac">semente</span></p></td><td class="cl-dce5547a"><p class="cl-dce54939"><span class="cl-dce386ac">146</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dce55479"><p class="cl-dce54938"><span class="cl-dce386ac">folha</span></p></td><td class="cl-dce5547a"><p class="cl-dce54939"><span class="cl-dce386ac">142</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dce55479"><p class="cl-dce54938"><span class="cl-dce386ac">raiz</span></p></td><td class="cl-dce5547a"><p class="cl-dce54939"><span class="cl-dce386ac">116</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-dce55482"><p class="cl-dce54938"><span class="cl-dce386ac">flor</span></p></td><td class="cl-dce55483"><p class="cl-dce54939"><span class="cl-dce386ac">65</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+<section id="quais-são-os-produtos-mais-citados-na-tabela-sociológica" class="level2">
+<h2 class="anchored" data-anchor-id="quais-são-os-produtos-mais-citados-na-tabela-sociológica">Quais são os produtos mais citados na tabela Sociológica?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Produtos mais citados </span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>produtos_mais_citados <span class="ot">&lt;-</span> tab_socio_ride <span class="sc">%&gt;%</span> <span class="co"># Tabela Sociológica do IFN</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="st">`</span><span class="at">NOME DESCRITO NO LSA</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Sem informação'</span>) <span class="sc">%&gt;%</span> <span class="co"># Filtrar somente os valores únicos</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">NOME DESCRITO NO LSA</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="co"># Agrupar por município e espécie</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Quantidade =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span><span class="co"># Listar os tipos de uso</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Quantidade)) <span class="sc">%&gt;%</span> <span class="co"># Ordenar de forma decrescente</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>) <span class="co"># Listar os 20 mais citados</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>tabela_produtos_mais_citados <span class="ot">&lt;-</span> produtos_mais_citados <span class="sc">%&gt;%</span> </span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_header_labels</span>(</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">NOME DESCRITO NO LSA</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Nome da Espécie - Popular"</span>,</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">Quantidade =</span> <span class="st">"Frequência de Repostas"</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bold</span>(<span class="at">part=</span><span class="st">"header"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bold</span>(<span class="at">j =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>),</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">i =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">1</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">2</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bg( bg = "lightblue", i = 1:5) %&gt;% # Cor de fundo</span></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_footer_lines</span>(</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Estão destacados em negrito os cinco produtos mais citados na tabela Sociológica do IFN. Nessa tabela possui somente os 20 produtos mais citados."</span></span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>tabela_produtos_mais_citados</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-de6d3752{}.cl-de68c2f8{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-de68c302{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-de6ab72a{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-de6ab734{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-de6ac33c{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-de6ac33d{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-de6ac346{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-de6ac347{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-de6ac350{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-de6ac35a{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-de6ac35b{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-de6d3752"><thead><tr style="overflow-wrap:break-word;"><th class="cl-de6ac33c"><p class="cl-de6ab72a"><span class="cl-de68c2f8">Nome da Espécie - Popular</span></p></th><th class="cl-de6ac33d"><p class="cl-de6ab734"><span class="cl-de68c2f8">Frequência de Repostas</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c2f8">Pequi</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c2f8">447</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c2f8">Sucupira</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c2f8">245</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c2f8">Jatobá</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c2f8">223</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c2f8">Caju</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c2f8">214</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c2f8">Mangaba</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c2f8">182</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Baru</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">175</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Aroeira</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">136</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Angico</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">126</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Barbatimão</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">122</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Cagaita</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">92</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Araticum</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">80</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Manga</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">80</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Ipê</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">62</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Tingui</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">48</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Goiaba</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">42</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Quina</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">40</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Pacari</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">38</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Mamica de cadela</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">36</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac346"><p class="cl-de6ab72a"><span class="cl-de68c302">Murici</span></p></td><td class="cl-de6ac347"><p class="cl-de6ab734"><span class="cl-de68c302">36</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-de6ac350"><p class="cl-de6ab72a"><span class="cl-de68c302">Imburana</span></p></td><td class="cl-de6ac35a"><p class="cl-de6ab734"><span class="cl-de68c302">35</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-de6ac35b"><p class="cl-de6ab72a"><span class="cl-de68c302">Estão destacados em negrito os cinco produtos mais citados na tabela Sociológica do IFN. Nessa tabela possui somente os 20 produtos mais citados.</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</section>
+<section id="quais-a-espécie-mais-usadas-por-município" class="level2">
+<h2 class="anchored" data-anchor-id="quais-a-espécie-mais-usadas-por-município">Quais a espécie mais usadas por município?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>especie_socio_ride <span class="ot">&lt;-</span> tab_socio_ride <span class="sc">%&gt;%</span> <span class="co"># Tabela Sociológica do IFN</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="st">`</span><span class="at">NOME DESCRITO NO LSA</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Sem informação'</span>) <span class="sc">%&gt;%</span> <span class="co"># Filtrar somente os valores válidos</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name_muni, <span class="st">`</span><span class="at">NOME DESCRITO NO LSA</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="co"># Agrupar por município e espécie</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Quantidade =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">'drop'</span>) <span class="sc">%&gt;%</span> <span class="co"># Contar a quantidade de espécies</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(name_muni), <span class="fu">desc</span>(Quantidade)) <span class="sc">%&gt;%</span> <span class="co"># Ordenar de forma decrescente pela quantidade</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name_muni) <span class="sc">%&gt;%</span> <span class="co"># Reagrupar por município</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">1</span>, Quantidade) <span class="co"># Selecionar os 1 maiores valores de cada município</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>tabela_especie_socio_ride <span class="ot">&lt;-</span> especie_socio_ride <span class="sc">%&gt;%</span> </span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_header_labels</span>(</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">name_muni =</span> <span class="st">"Município"</span>,</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">NOME DESCRITO NO LSA</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Nome da Espécie - Popular"</span>,</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Quantidade =</span> <span class="st">"Frequência de Respostas"</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">1</span>, <span class="at">width =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">2</span>, <span class="at">width =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">3</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_vanilla</span>()</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>tabela_especie_socio_ride</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e3053efe{}.cl-e2ffdd56{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e2ffdd60{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e3028c72{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e3028c73{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e3029924{width:2in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e302992e{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e302992f{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3029938{width:2in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3029939{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e302993a{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3029942{width:2in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3029943{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e302994c{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3029956{width:2in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3029957{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3029958{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e3053efe"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e3029924"><p class="cl-e3028c72"><span class="cl-e2ffdd56">Município</span></p></th><th class="cl-e302992e"><p class="cl-e3028c72"><span class="cl-e2ffdd56">Nome da Espécie - Popular</span></p></th><th class="cl-e302992f"><p class="cl-e3028c73"><span class="cl-e2ffdd56">Frequência de Respostas</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e3029938"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Água Fria de Goiás</span></p></td><td class="cl-e3029939"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302993a"><p class="cl-e3028c73"><span class="cl-e2ffdd60">3</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Vila Propício</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">19</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Vila Boa</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">10</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">São João D'aliança</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Caju</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">9</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Simolândia</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Simolândia</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Sucupira</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Santo Antônio do Descoberto</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Angico</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">2</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Santo Antônio do Descoberto</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Gueroba</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">2</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Santo Antônio do Descoberto</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">2</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Planaltina</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Sucupira</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">22</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pirenópolis</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Angico</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">9</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Padre Bernardo</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">17</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Niquelândia</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">62</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Mimoso de Goiás</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Sucupira</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">12</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Luziânia</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">32</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Goianésia</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Formosa</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Sucupira</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">54</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Flores de Goiás</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">18</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Cristalina</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">32</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Corumbá de Goiás</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Cocalzinho de Goiás</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">15</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Cavalcante</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">41</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Cabeceiras</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Brasília</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">49</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Barro Alto</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Baru</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Alvorada do Norte</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">10</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Alto Paraíso de Goiás</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Jatobá</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029942"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Alexânia</span></p></td><td class="cl-e3029943"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Pequi</span></p></td><td class="cl-e302994c"><p class="cl-e3028c73"><span class="cl-e2ffdd60">6</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3029956"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Abadiânia</span></p></td><td class="cl-e3029957"><p class="cl-e3028c72"><span class="cl-e2ffdd60">Caju</span></p></td><td class="cl-e3029958"><p class="cl-e3028c73"><span class="cl-e2ffdd60">4</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+</section>
+<section id="espécies-selecionadas-na-tabela-biofísica" class="level1">
+<h1>ESPÉCIES SELECIONADAS NA TABELA BIOFÍSICA</h1>
+<section id="selecionar-algumas-espécies-de-produtos-florestais-não-madeireiros-pfnm-do-cerrado" class="level2">
+<h2 class="anchored" data-anchor-id="selecionar-algumas-espécies-de-produtos-florestais-não-madeireiros-pfnm-do-cerrado">Selecionar algumas espécies de produtos florestais não madeireiros (PFNM) do Cerrado</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Importa os dados de um arquivo CSV chamado "Especies de PFNM do Cerrado.csv" </span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co"># e os armazena no objeto 'produtos'.</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>produtos <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"Especies de PFNM do Cerrado.csv"</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Processa os dados para criar uma lista de nomes científicos únicos.</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>lista_produtos <span class="ot">&lt;-</span> produtos <span class="sc">%&gt;%</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Nome_Cientifico)) <span class="sc">%&gt;%</span>  <span class="co"># Filtra as linhas onde 'Nome_Cientifico' não é NA.</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(Nome_Cientifico) <span class="sc">%&gt;%</span>            <span class="co"># Extrai os valores da coluna 'Nome_Cientifico' como um vetor.</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strsplit</span>(<span class="st">" "</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span>      <span class="co"># Divide cada nome científico no espaço (resultado é uma lista).</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(<span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="dv">1</span>)                      <span class="co"># Extrai a primeira palavra (gênero) de cada nome científico.</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibe o vetor 'lista_produtos'.</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>lista_produtos</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Anadenanthera"   "Annona"          "Attalea"         "Platonia"       
+ [5] "Stryphnodendron" "Dipteryx"        "Vanila"          "Mauritia"       
+ [9] "Eugenia"         "Anacardium"      "Copaifera"       "Dimorphandra"   
+[13] "Syagrus"         "Inga"            "Syzygium"        "Hymenaea"       
+[17] "Genipa"          "Euterpe"         "Acrocomia"       "Hancornia"      
+[21] "Passiflora"      "Cordiera"        "Alibertia"       "Byrsonima"      
+[25] "Caryocar"        "Bowdichia"       "Pterodon"       </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria uma expressão regular com os gêneros separados por "|",</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># permitindo buscar qualquer um desses gêneros no próximo passo.</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>padrao <span class="ot">&lt;-</span> <span class="fu">paste</span>(lista_produtos, <span class="at">collapse =</span> <span class="st">"|"</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtra as linhas do data frame 'tab_bio_taxon_ride'</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co"># que contêm algum dos gêneros em 'padrao' na coluna 'scientificName'.</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>produtos_bio_ride <span class="ot">&lt;-</span> tab_bio_taxon_ride <span class="sc">%&gt;%</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(scientificName, padrao))</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="co"># st_write(produtos_bio_ride, "produtos_bio_ride.gpkg", delete_dsn = TRUE, driver = "GPKG")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="quais-as-espécies-produtos-mais-usados" class="level2">
+<h2 class="anchored" data-anchor-id="quais-as-espécies-produtos-mais-usados">Quais as espécies (produtos) mais usados ?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Nomes Populares </span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>df_produtos_nome_populares <span class="ot">&lt;-</span> produtos <span class="sc">%&gt;%</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">genero =</span> <span class="fu">strsplit</span>(Nome_Cientifico, <span class="st">" "</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">sapply</span>(<span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="dv">1</span>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Produtos mais citados </span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>produtos_bio_mais_citados <span class="ot">&lt;-</span> produtos_bio_ride <span class="sc">%&gt;%</span> <span class="co"># Tabela Sociológica do IFN</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(scientificName) <span class="sc">%&gt;%</span> <span class="co"># Agrupar por município e espécie</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Quantidade =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span><span class="co"># Listar os tipos de uso</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Quantidade)) <span class="sc">%&gt;%</span> <span class="co"># Ordenar de forma decrescente</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nome_Popular =</span> <span class="fu">associar_nome_popular</span>(scientificName, df_produtos_nome_populares)</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>) <span class="co"># Listar os 20 mais citados</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabela</span></span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>tabela_produtos_bio_mais_citados <span class="ot">&lt;-</span> produtos_bio_mais_citados <span class="sc">%&gt;%</span> </span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(scientificName, Nome_Popular, Quantidade) <span class="sc">%&gt;%</span></span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_header_labels</span>(</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">scientificName =</span> <span class="st">"Nome Científico"</span>,</span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nome_Popular =</span> <span class="st">"Nome Popular"</span>,</span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">Quantidade =</span> <span class="st">"Frequência de Repostas"</span></span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bold</span>(<span class="at">part=</span><span class="st">"header"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bold(j = c(1:2),</span></span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>       <span class="co"># i = c(1:5)) %&gt;%</span></span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">1</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">2</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bg( bg = "lightblue", i = 1:5) %&gt;%</span></span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_footer_lines</span>(</span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Foi realizada uma seleção inicial de 29 espécies, e com base nessa seleção, as 20 espécies mais citadas (tab. Biofísica IFN) estão apresentadas nessa tabela."</span></span>
+<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a>tabela_produtos_bio_mais_citados</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e373919c{}.cl-e36f521c{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e36f5226{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e3711110{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e371111a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e3711d18{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3711d22{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3711d23{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3711d2c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3711d36{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3711d37{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3711d38{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e3711d40{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e373919c"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e3711d18"><p class="cl-e3711110"><span class="cl-e36f521c">Nome Científico</span></p></th><th class="cl-e3711d18"><p class="cl-e3711110"><span class="cl-e36f521c">Nome Popular</span></p></th><th class="cl-e3711d22"><p class="cl-e371111a"><span class="cl-e36f521c">Frequência de Repostas</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Copaifera langsdorffii Desf.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Copaíba</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">229</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Byrsonima pachyphylla A.Juss.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Murici</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">228</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Byrsonima coccolobifolia Kunth</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Murici</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">214</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Bowdichia virgilioides Kunth</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Sucupira</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">201</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Caryocar brasiliense Cambess.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Pequi</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">191</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Byrsonima clausseniana A.Juss.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Murici</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">154</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Hymenaea stigonocarpa Mart. ex Hayne</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Jatobá</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">129</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Syagrus flexuosa (Mart.) Becc.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Guariroba</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">110</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Anadenanthera Speg.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Angico</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">97</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Syagrus Mart.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Guariroba</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">87</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Pterodon emarginatus Vogel</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Sucupira-branca</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">81</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Stryphnodendron adstringens (Mart.) Coville</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Barbatimão</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">76</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Dimorphandra mollis Benth.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Fava d'anta/Faveiro</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">74</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Cordiera myrciifolia (K.Schum.) C.H.Perss. &amp; Delprete</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Marmelada/marmelada-de-cachorro</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">65</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Anacardium occidentale L.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Cajuzinho-do-cerrado</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">61</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Inga Mill.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Ingá</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">58</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Eugenia dysenterica (Mart.) DC.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Cagaita</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">48</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Hancornia speciosa Gomes</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Mangaba</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">47</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Byrsonima guilleminiana A.Juss.</span></p></td><td class="cl-e3711d23"><p class="cl-e3711110"><span class="cl-e36f5226">Murici</span></p></td><td class="cl-e3711d2c"><p class="cl-e371111a"><span class="cl-e36f5226">44</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e3711d36"><p class="cl-e3711110"><span class="cl-e36f5226">Hymenaea L.</span></p></td><td class="cl-e3711d36"><p class="cl-e3711110"><span class="cl-e36f5226">Jatobá</span></p></td><td class="cl-e3711d37"><p class="cl-e371111a"><span class="cl-e36f5226">44</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="3" class="cl-e3711d38"><p class="cl-e3711110"><span class="cl-e36f5226">Foi realizada uma seleção inicial de 29 espécies, e com base nessa seleção, as 20 espécies mais citadas (tab. Biofísica IFN) estão apresentadas nessa tabela.</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</section>
+<section id="quais-as-espécies-produtos-mais-usadas-por-município" class="level2">
+<h2 class="anchored" data-anchor-id="quais-as-espécies-produtos-mais-usadas-por-município">Quais as espécies (produtos) mais usadas por município?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Produtos mais citados </span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>produtos_bio_mais_citados_ride <span class="ot">&lt;-</span> produtos_bio_ride <span class="sc">%&gt;%</span> <span class="co"># Tabela Sociológica do IFN</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name_muni, scientificName) <span class="sc">%&gt;%</span> <span class="co"># Agrupar por município e espécie</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Quantidade =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">'drop'</span>) <span class="sc">%&gt;%</span> <span class="co"># Contar a quantidade de espécies</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(name_muni), <span class="fu">desc</span>(Quantidade)) <span class="sc">%&gt;%</span> <span class="co"># Ordenar de forma decrescente pela quantidade</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name_muni) <span class="sc">%&gt;%</span> <span class="co"># Reagrupar por município</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nome_Popular =</span> <span class="fu">associar_nome_popular</span>(scientificName, df_produtos_nome_populares)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name_muni, scientificName, Nome_Popular, Quantidade) <span class="sc">%&gt;%</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(Quantidade, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="co"># Selecionar a maior quantidade de cada município</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabela</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>tabela_produtos_bio_mais_citados_ride <span class="ot">&lt;-</span> produtos_bio_mais_citados_ride <span class="sc">%&gt;%</span> </span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_header_labels</span>(</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">name_muni =</span> <span class="st">"Município"</span>,</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">scientificName =</span> <span class="st">"Nome do Científico"</span>,</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nome_Popular =</span> <span class="st">"Nome Popular"</span>,</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">Quantidade =</span> <span class="st">"Frequencia do Produto"</span></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bold</span>(<span class="at">part=</span><span class="st">"header"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bold(j = c(1:2),</span></span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>       <span class="co"># i = c(1:5)) %&gt;%</span></span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">1</span>, <span class="at">width =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">2</span>, <span class="at">width =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">3</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">width</span>( <span class="at">j =</span> <span class="dv">4</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bg( bg = "lightblue", i = 1:5) %&gt;%</span></span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_footer_lines</span>(</span>
+<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Foi realizada uma seleção prévia de 29 espécies, e com base nessa seleção, as mais citadas (tab. Biofísica) por município estão contidas nessa tabela."</span></span>
+<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>tabela_produtos_bio_mais_citados_ride</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e5351ffa{}.cl-e52d6166{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e52d6170{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e52f2014{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e52f201e{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e52f2fb4{width:2in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fb5{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fbe{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fbf{width:2in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fc8{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fd2{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fd3{width:2in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fdc{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fdd{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2fe6{width:2in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e52f2ff0{width:1.5in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e5351ffa"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e52f2fb4"><p class="cl-e52f2014"><span class="cl-e52d6166">Município</span></p></th><th class="cl-e52f2fb4"><p class="cl-e52f2014"><span class="cl-e52d6166">Nome do Científico</span></p></th><th class="cl-e52f2fb5"><p class="cl-e52f2014"><span class="cl-e52d6166">Nome Popular</span></p></th><th class="cl-e52f2fbe"><p class="cl-e52f201e"><span class="cl-e52d6166">Frequencia do Produto</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Abadiânia</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima pachyphylla A.Juss.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">6</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Alexânia</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Bowdichia virgilioides Kunth</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Sucupira</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">12</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Alto Paraíso de Goiás</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima coccolobifolia Kunth</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">15</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Alvorada do Norte</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima pachyphylla A.Juss.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">63</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Barro Alto</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima clausseniana A.Juss.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">25</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Brasília</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Syagrus flexuosa (Mart.) Becc.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Guariroba</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">99</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Cavalcante</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Copaifera langsdorffii Desf.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Copaíba</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">87</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Cocalzinho de Goiás</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima clausseniana A.Juss.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">25</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Corumbá de Goiás</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Anadenanthera Speg.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Angico</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Cristalina</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Eugenia florida DC.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Cagaita</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">27</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Flores de Goiás</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima clausseniana A.Juss.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">26</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Formosa</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Caryocar brasiliense Cambess.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Pequi</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">27</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Goianésia</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Bowdichia virgilioides Kunth</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Sucupira</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">2</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Luziânia</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima pachyphylla A.Juss.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">31</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Mimoso de Goiás</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Copaifera langsdorffii Desf.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Copaíba</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Niquelândia</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Hymenaea stigonocarpa Mart. ex Hayne</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Jatobá</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">19</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Padre Bernardo</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Bowdichia virgilioides Kunth</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Sucupira</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">25</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Pirenópolis</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Hymenaea stigonocarpa Mart. ex Hayne</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Jatobá</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">18</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Planaltina</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Anadenanthera Speg.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Angico</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">32</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Santo Antônio do Descoberto</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima pachyphylla A.Juss.</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">8</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">São João D'aliança</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Bowdichia virgilioides Kunth</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Sucupira</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">10</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Vila Boa</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Dipteryx alata Vogel</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Baru</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Vila Propício</span></p></td><td class="cl-e52f2fbf"><p class="cl-e52f2014"><span class="cl-e52d6170">Byrsonima coccolobifolia Kunth</span></p></td><td class="cl-e52f2fc8"><p class="cl-e52f2014"><span class="cl-e52d6170">Murici</span></p></td><td class="cl-e52f2fd2"><p class="cl-e52f201e"><span class="cl-e52d6170">30</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e52f2fd3"><p class="cl-e52f2014"><span class="cl-e52d6170">Água Fria de Goiás</span></p></td><td class="cl-e52f2fd3"><p class="cl-e52f2014"><span class="cl-e52d6170">Pterodon emarginatus Vogel</span></p></td><td class="cl-e52f2fdc"><p class="cl-e52f2014"><span class="cl-e52d6170">Sucupira-branca</span></p></td><td class="cl-e52f2fdd"><p class="cl-e52f201e"><span class="cl-e52d6170">20</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="4" class="cl-e52f2fe6"><p class="cl-e52f2014"><span class="cl-e52d6170">Foi realizada uma seleção prévia de 29 espécies, e com base nessa seleção, as mais citadas (tab. Biofísica) por município estão contidas nessa tabela.</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

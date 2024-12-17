@@ -4,7 +4,7 @@ author: "Rogerio Vidal de Siqueira"
 date: "`r format(Sys.Date(),'%d/%m/%Y')`"
 ---
 
-```{r sets, echo=F, message=FALSE, warning=FALSE}
+```{r sets, message=FALSE, warning=FALSE}
 
 # PRE-SETS ----
 rm(list=ls()) # limpa  o ambiente de trabalho
@@ -19,7 +19,9 @@ pacman::p_load(tidyverse, # pacote para manipulação de dados
                downloader, # pacote para download de arquivos
                sf, #pacote para manipulação de dados espaciais
                geobr, # pacote para baixar shapefiles do Brasil
-               flextable # pacote para criar tabelas
+               flextable, # pacote para criar tabelas
+               patchwork, # pacote para criar relatórios
+               ggpattern # pacote para criar padrões
                )
 
 # Carregar funções 
@@ -176,7 +178,7 @@ geo_bio_DFGOMG_filtrado <- geo_bio_DFGOMG %>%
 
 ```
 
-```{r}
+```{r, echo=F}
 # Salvar arquivos
 #st_write(geo_soc_DFGO, "geo_levantamento_socioambiental_limpo_filtro_go.shp", delete_dsn = TRUE)
 ```
@@ -217,7 +219,7 @@ tab_bio_taxon %>%
 
 ## Distribuir a alturas das espécies
 
-```{r}
+```{r, warning = FALSE}
 
 tab_bio_taxon %>%
   ggplot() +
@@ -244,6 +246,10 @@ mun_bio_sem_dados_IFN <- mun_ride %>%
 
 mun_bio_sem_dados_IFN
 
+geo_mun_bio_sem_dados_IFN <- mun_ride %>%
+  filter(!name_muni %in% tab_bio_ride$name_muni) %>%
+  select(name_muni, name_state)
+
 # Sociológico
 mun_socio_sem_dados_IFN <- mun_ride %>%
   filter(!name_muni %in% tab_socio_ride$name_muni) %>%
@@ -251,6 +257,10 @@ mun_socio_sem_dados_IFN <- mun_ride %>%
   st_drop_geometry()
 
 mun_socio_sem_dados_IFN
+
+
+
+
 
 ```
 
@@ -268,19 +278,37 @@ tab_bio_taxon_ride <- tab_bio_taxon %>%
 
 # Visualizar dados processados e relacionados
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 
 
-ggplot(tab_bio_taxon_ride) + 
-  geom_sf() +
+# Criação de um mapa combinando os dois objetos
+map_combinado <- ggplot() + 
+  geom_sf(data = mun_ride, fill = "gray90", color = "black") + # Camada de municípios
+  geom_sf_pattern(  # Camada de municípios sem dados
+                  data= geo_mun_bio_sem_dados_IFN, pattern = "stripe",           # Tipo de padrão (stripe, crosshatch, etc.)
+                  pattern_angle = 45,            # Ângulo das hachuras
+                  pattern_density = 0.01,        # Densidade das linhas
+                  pattern_spacing = 0.02,        # Espaçamento entre as linhas
+                  pattern_size = 0.1,        # Espessura das linhas (bem finas)
+                  fill = "gray90",               # Cor de fundo
+                  pattern_color = "black") +     # Cor das linhas do padrão
+ 
+  geom_sf(data = tab_bio_taxon_ride, color = "blue", size = 1) + # Camada de pontos espacializados
   theme_minimal()
+
+# Visualizar o mapa
+map_combinado
+
+```
+
+```{r, echo=F}
 
 # st_write(tab_bio_taxon_ride, "tab_bio_taxon_ride.gpkg", delete_dsn = TRUE)
 ```
 
+```{r, echo=F}
 ## Relação espacial entre os dados Biofísico + Taxon do IFN e Sociológicos do IFN (Comentado)
 
-```{r}
 
 # tab_bio_socio_taxon_ride <- geo_soc_DFGOMG %>% # Tabela Sociológica do IFN
 #   st_transform(crs = 4674) %>% # Transformar o sistema de coordenadas
@@ -346,10 +374,10 @@ flex_registros_bio <- registros_bio %>%
   bold(part="header") %>%
   bold(j = c(1:2),
        i = c(1:5)) %>%
-  width( j = 1, width = 1.5) %>%
-  width( j = 2, width = 1.5) %>%
+  width( j = 1, width = 2.5) %>%
+  width( j = 2, width = 2.5) %>%
   add_footer_lines(
-    "Estão destacados as 30 espécies mais registranas na tabela Biofísica do IFN."
+    "Estão destacados as 30 espécies com mais registros na tabela Biofísica do IFN."
   )
   
 flex_registros_bio
@@ -377,11 +405,11 @@ flex_tabela_usos <- tipos_usos %>%
   flextable() %>%
   set_header_labels(
     PARTE_UTI = "Tipos de Usos",
-    Quantidade = "Quantidade de Usos"
+    Quantidade = "Frequência de Repostas"
   ) %>%
   bold(part="header") %>%
-  bold(j = c(1:2),
-       i = c(1:3)) %>%
+  # bold(j = c(1:2), # Negrito na coluna 1 e 2
+       # i = c(1:3)) %>% # Negrito nas linhas 1, 2 e 3
   width( j = 1, width = 1.5) %>%
   width( j = 2, width = 1.5)
   
@@ -403,17 +431,17 @@ tabela_produtos_mais_citados <- produtos_mais_citados %>%
   st_drop_geometry() %>%
   flextable() %>%
   set_header_labels(
-    `NOME DESCRITO NO LSA` = "Nome do Produto",
-    Quantidade = "Quantidade de Usos"
+    `NOME DESCRITO NO LSA` = "Nome da Espécie - Popular",
+    Quantidade = "Frequência de Repostas"
   ) %>%
   bold(part="header") %>%
   bold(j = c(1:2),
        i = c(1:5)) %>%
   width( j = 1, width = 1.5) %>%
   width( j = 2, width = 1.5) %>%
-  bg( bg = "lightblue", i = 1:5) %>%
+  # bg( bg = "lightblue", i = 1:5) %>% # Cor de fundo
   add_footer_lines(
-    "Estão destacados os cinco produtos mais citados na tabela Sociológica do IFN."
+    "Estão destacados em negrito os cinco produtos mais citados na tabela Sociológica do IFN. Nessa tabela possui somente os 20 produtos mais citados."
   )
   
 tabela_produtos_mais_citados
@@ -424,9 +452,6 @@ tabela_produtos_mais_citados
 ## Quais a espécie mais usadas por município?
 
 ```{r analise-sociologica-especies-mais-usadas-municipio}
-
-#| echo: false
-#| 
 
 especie_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores válidos
@@ -442,7 +467,7 @@ tabela_especie_socio_ride <- especie_socio_ride %>%
   flextable() %>%
   set_header_labels(
     name_muni = "Município",
-    `NOME DESCRITO NO LSA` = "Nome do Produto",
+    `NOME DESCRITO NO LSA` = "Nome da Espécie - Popular",
     Quantidade = "Frequência de Respostas"
   ) %>%
   width( j = 1, width = 2) %>%
@@ -453,7 +478,7 @@ tabela_especie_socio_ride <- especie_socio_ride %>%
 tabela_especie_socio_ride
 ```
 
-# PRODUTOS SELECIONADOS (Tabela Biofísica)
+# ESPÉCIES SELECIONADAS NA TABELA BIOFÍSICA
 
 ## Selecionar algumas espécies de produtos florestais não madeireiros (PFNM) do Cerrado
 ```{r}
@@ -469,7 +494,7 @@ lista_produtos <- produtos %>%
   strsplit(" ", fixed = TRUE) %>%      # Divide cada nome científico no espaço (resultado é uma lista).
   sapply(`[[`, 1)                      # Extrai a primeira palavra (gênero) de cada nome científico.
 
-# Exibe o vetor 'lista_produtos' em uma janela interativa para visualização.
+# Exibe o vetor 'lista_produtos'.
 lista_produtos
 
 # Cria uma expressão regular com os gêneros separados por "|",
@@ -515,13 +540,13 @@ tabela_produtos_bio_mais_citados <- produtos_bio_mais_citados %>%
     Quantidade = "Frequência de Repostas"
   ) %>%
   bold(part="header") %>%
-  bold(j = c(1:2),
-       i = c(1:5)) %>%
+  # bold(j = c(1:2),
+       # i = c(1:5)) %>%
   width( j = 1, width = 1.5) %>%
   width( j = 2, width = 1.5) %>%
   # bg( bg = "lightblue", i = 1:5) %>%
   add_footer_lines(
-    "Foi realizada uma seleção inicial de 29 espécies, e com base nessa seleção, as 20 espécies mais citadas (tab. Biofísica IFN) estão destacadas nesta tabela."
+    "Foi realizada uma seleção inicial de 29 espécies, e com base nessa seleção, as 20 espécies mais citadas (tab. Biofísica IFN) estão apresentadas nessa tabela."
   )
 
 tabela_produtos_bio_mais_citados
@@ -538,10 +563,11 @@ produtos_bio_mais_citados_ride <- produtos_bio_ride %>% # Tabela Sociológica do
   summarise(Quantidade = n(), .groups = 'drop') %>% # Contar a quantidade de espécies
   arrange(desc(name_muni), desc(Quantidade)) %>% # Ordenar de forma decrescente pela quantidade
   group_by(name_muni) %>% # Reagrupar por município
-  # mutate(
-  #   Nome_Popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
-  #       ) %>%
-  top_n(1, Quantidade) # Selecionar os 1 maiores valores de cada município
+  mutate(
+    Nome_Popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+        ) %>%
+  select(name_muni, scientificName, Nome_Popular, Quantidade) %>%
+  slice_max(Quantidade, with_ties = FALSE) # Selecionar a maior quantidade de cada município
 
 
 # Tabela
@@ -549,14 +575,18 @@ tabela_produtos_bio_mais_citados_ride <- produtos_bio_mais_citados_ride %>%
   st_drop_geometry() %>%
   flextable() %>%
   set_header_labels(
-    scientificName = "Nome do Produto",
+    name_muni = "Município",
+    scientificName = "Nome do Científico",
+    Nome_Popular = "Nome Popular",
     Quantidade = "Frequencia do Produto"
   ) %>%
   bold(part="header") %>%
-  bold(j = c(1:2),
-       i = c(1:5)) %>%
-  width( j = 1, width = 1.5) %>%
-  width( j = 2, width = 1.5) %>%
+  # bold(j = c(1:2),
+       # i = c(1:5)) %>%
+  width( j = 1, width = 2) %>%
+  width( j = 2, width = 2) %>%
+  width( j = 3, width = 1.5) %>%
+  width( j = 4, width = 1.5) %>%
   # bg( bg = "lightblue", i = 1:5) %>%
   add_footer_lines(
     "Foi realizada uma seleção prévia de 29 espécies, e com base nessa seleção, as mais citadas (tab. Biofísica) por município estão contidas nessa tabela."
