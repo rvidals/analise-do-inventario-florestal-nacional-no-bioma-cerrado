@@ -21,7 +21,8 @@ pacman::p_load(tidyverse, # pacote para manipulação de dados
                geobr, # pacote para baixar shapefiles do Brasil
                flextable, # pacote para criar tabelas
                patchwork, # pacote para criar relatórios
-               ggpattern # pacote para criar padrões
+               ggpattern, # pacote para criar padrões
+               ggthemes # pacote para criar temas
                )
 
 # Carregar funções 
@@ -449,6 +450,317 @@ tabela_produtos_mais_citados
 ```
 
 
+## Espacializar os 05 mais citados na tabela Sociológica
+
+## 1º Pequi
+
+```{r}
+
+# Produtos mais citados 
+pequi_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  filter(`NOME DESCRITO NO LSA` == 'Pequi') %>% # Filtrar somente os valores únicos
+  group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
+  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
+  st_drop_geometry() %>% # Apagar Geometria
+  rename("nome_popular" = `NOME DESCRITO NO LSA`,
+         "nome_municipio" = name_muni)
+
+
+# distribuição espacial 
+
+mapa_pequi <- pequi_frequencia_resposta_socio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 65, 10),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Pequi",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_pequi
+
+
+
+
+```
+
+
+## 2º Sucupira
+
+```{r}
+
+# Produtos mais citados 
+sucupira_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  filter(`NOME DESCRITO NO LSA` == 'Sucupira') %>% # Filtrar somente os valores únicos
+  group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
+  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
+  st_drop_geometry() %>% # Apagar Geometria
+  rename("nome_popular" = `NOME DESCRITO NO LSA`,
+         "nome_municipio" = name_muni)
+
+
+# distribuição espacial 
+
+mapa_sucupira <- sucupira_frequencia_resposta_socio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 55, 10),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial da Sucupira",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_sucupira
+
+
+
+```
+
+## 3º Jatobá
+
+```{r}
+
+# Produtos mais citados 
+jatoba_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  filter(`NOME DESCRITO NO LSA` == 'Jatobá') %>% # Filtrar somente os valores únicos
+  group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
+  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
+  st_drop_geometry() %>% # Apagar Geometria
+  rename("nome_popular" = `NOME DESCRITO NO LSA`,
+         "nome_municipio" = name_muni)
+
+
+# distribuição espacial 
+
+mapa_jatoba <- jatoba_frequencia_resposta_socio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 55, 10),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Jatobá",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_jatoba
+
+
+```
+
+## 4º Cajú * (Pode ser cajú comum ou cajú do cerrado, não está especificado)
+
+```{r}
+
+# Produtos mais citados 
+caju_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  filter(`NOME DESCRITO NO LSA` == 'Caju') %>% # Filtrar somente os valores únicos
+  group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
+  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
+  st_drop_geometry() %>% # Apagar Geometria
+  rename("nome_popular" = `NOME DESCRITO NO LSA`,
+         "nome_municipio" = name_muni)
+
+
+# distribuição espacial 
+
+mapa_caju <- caju_frequencia_resposta_socio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 30, 5),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Cajú",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_caju
+
+
+
+```
+
+## 5º Mangaba
+
+```{r}
+
+# Produtos mais citados 
+mangaba_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  filter(`NOME DESCRITO NO LSA` == 'Mangaba') %>% # Filtrar somente os valores únicos
+  group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
+  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
+  st_drop_geometry() %>% # Apagar Geometria
+  rename("nome_popular" = `NOME DESCRITO NO LSA`,
+         "nome_municipio" = name_muni)
+
+
+# distribuição espacial 
+
+mapa_mangaba <- mangaba_frequencia_resposta_socio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 40, 5),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial da Mangaba",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_mangaba
+
+```
+
+## 6º Baru (Caso retire o Cajú)
+
+```{r}
+
+# Produtos mais citados 
+baru_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
+  filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
+  filter(`NOME DESCRITO NO LSA` == 'Baru') %>% # Filtrar somente os valores únicos
+  group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
+  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
+  st_drop_geometry() %>% # Apagar Geometria
+  rename("nome_popular" = `NOME DESCRITO NO LSA`,
+         "nome_municipio" = name_muni)
+
+
+# distribuição espacial 
+
+mapa_baru <- baru_frequencia_resposta_socio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 45, 5),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Baru",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_baru
+
+```
+
 ## Quais a espécie mais usadas por município?
 
 ```{r analise-sociologica-especies-mais-usadas-municipio}
@@ -551,6 +863,116 @@ tabela_produtos_bio_mais_citados <- produtos_bio_mais_citados %>%
 
 tabela_produtos_bio_mais_citados
 ```
+## Espacializar os 05 mais citados
+## 1º Copaíba
+
+```{r}
+
+# Produtos mais citados 
+
+copaiba_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+  mutate(
+    nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+   filter(nome_popular == 'Copaíba') %>% # Filtrar somente os valores únicos
+  group_by(nome_popular, name_muni) %>% # Agrupar por município e espécie
+  summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
+  arrange(desc(freq)) %>% # Ordenar de forma decrescente
+  rename("nome_municipio" = name_muni) %>%
+  st_drop_geometry()
+
+
+# distribuição espacial 
+
+mapa_copaiba <- copaiba_freq_respostas_bio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 100, 20),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Copaiba",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_copaiba
+
+```
+
+## 2º Murici
+
+```{r}
+
+# Produtos mais citados 
+
+murici_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+  mutate(
+    nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+   filter(nome_popular == 'Muricí') %>% # Filtrar somente os valores únicos
+  group_by(nome_popular, name_muni) %>% # Agrupar por município e espécie
+  summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
+  arrange(desc(freq)) %>% # Ordenar de forma decrescente
+  rename("nome_municipio" = name_muni) %>%
+  st_drop_geometry()
+
+
+# distribuição espacial 
+
+mapa_murici <- murici_freq_respostas_bio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 100, 20),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Copaiba",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_copaiba
+
+```
+
+## 3º Sucupira
+## 4º Pequi
+## 5º Jatobá
+## 6º Guariroba
+
 
 
 ## Quais as espécies (produtos) mais usadas por município?
