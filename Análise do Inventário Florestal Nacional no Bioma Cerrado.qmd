@@ -456,17 +456,18 @@ tabela_produtos_mais_citados
 
 ```{r}
 
+
+
 # Produtos mais citados 
 pequi_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
   filter(`NOME DESCRITO NO LSA` == 'Pequi') %>% # Filtrar somente os valores únicos
   group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
-  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  summarise(frequencia = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
   st_drop_geometry() %>% # Apagar Geometria
   rename("nome_popular" = `NOME DESCRITO NO LSA`,
          "nome_municipio" = name_muni)
-
 
 # distribuição espacial 
 
@@ -515,7 +516,7 @@ sucupira_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológ
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
   filter(`NOME DESCRITO NO LSA` == 'Sucupira') %>% # Filtrar somente os valores únicos
   group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
-  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  summarise(frequencia = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
   st_drop_geometry() %>% # Apagar Geometria
   rename("nome_popular" = `NOME DESCRITO NO LSA`,
@@ -567,7 +568,7 @@ jatoba_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológic
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
   filter(`NOME DESCRITO NO LSA` == 'Jatobá') %>% # Filtrar somente os valores únicos
   group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
-  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  summarise(frequencia = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
   st_drop_geometry() %>% # Apagar Geometria
   rename("nome_popular" = `NOME DESCRITO NO LSA`,
@@ -618,7 +619,7 @@ caju_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica 
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
   filter(`NOME DESCRITO NO LSA` == 'Caju') %>% # Filtrar somente os valores únicos
   group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
-  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  summarise(frequencia = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
   st_drop_geometry() %>% # Apagar Geometria
   rename("nome_popular" = `NOME DESCRITO NO LSA`,
@@ -670,7 +671,7 @@ mangaba_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológi
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
   filter(`NOME DESCRITO NO LSA` == 'Mangaba') %>% # Filtrar somente os valores únicos
   group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
-  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  summarise(frequencia = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
   st_drop_geometry() %>% # Apagar Geometria
   rename("nome_popular" = `NOME DESCRITO NO LSA`,
@@ -720,7 +721,7 @@ baru_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica 
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
   filter(`NOME DESCRITO NO LSA` == 'Baru') %>% # Filtrar somente os valores únicos
   group_by(`NOME DESCRITO NO LSA`, name_muni) %>% # Agrupar por município e espécie
-  summarise(frequencia = n()) %>%# Listar os tipos de uso
+  summarise(frequencia = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(frequencia)) %>% # Ordenar de forma decrescente
   st_drop_geometry() %>% # Apagar Geometria
   rename("nome_popular" = `NOME DESCRITO NO LSA`,
@@ -797,7 +798,7 @@ tabela_especie_socio_ride
 
 # Importa os dados de um arquivo CSV chamado "Especies de PFNM do Cerrado.csv" 
 # e os armazena no objeto 'produtos'.
-produtos <- import("Especies de PFNM do Cerrado.csv")
+produtos <- import("lista de especies do cerrado.csv")
 
 # Processa os dados para criar uma lista de nomes científicos únicos.
 lista_produtos <- produtos %>%
@@ -882,12 +883,29 @@ copaiba_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica d
   st_drop_geometry()
 
 
+# Municípios sem dados
+sem_dados <- mun_ride %>%
+  filter(!name_muni %in% copaiba_freq_respostas_bio_ride$nome_municipio) %>%
+  select(name_muni, name_state)
+
+# print(
+#   copaiba_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
+#   ) # 89
+
 # distribuição espacial 
 
 mapa_copaiba <- copaiba_freq_respostas_bio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
   geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  geom_sf_pattern(  # Camada de municípios sem dados
+                  data= sem_dados, pattern = "stripe",           # Tipo de padrão (stripe, crosshatch, etc.)
+                  pattern_angle = 45,            # Ângulo das hachuras
+                  pattern_density = 0.01,        # Densidade das linhas
+                  pattern_spacing = 0.02,        # Espaçamento entre as linhas
+                  pattern_size = 0.1,        # Espessura das linhas (bem finas)
+                  fill = "gray90",               # Cor de fundo
+                  pattern_color = "black") +     # Cor das linhas do padrão
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 100, 20),
@@ -926,13 +944,17 @@ murici_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do
   mutate(
     nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
   ) %>%
-   filter(nome_popular == 'Muricí') %>% # Filtrar somente os valores únicos
+   filter(nome_popular == 'Murici') %>% # Filtrar somente os valores únicos
   group_by(nome_popular, name_muni) %>% # Agrupar por município e espécie
   summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(freq)) %>% # Ordenar de forma decrescente
   rename("nome_municipio" = name_muni) %>%
   st_drop_geometry()
 
+
+# print(
+#   murici_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
+#   ) # 34
 
 # distribuição espacial 
 
@@ -942,7 +964,7 @@ mapa_murici <- murici_freq_respostas_bio_ride %>%
   geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
   scale_fill_fermenter(
     name = "",
-    breaks = seq(0, 100, 20),
+    breaks = seq(0, 160, 20),
     direction = 1,
     palette = "YlGnBu"
   ) + 
@@ -969,11 +991,230 @@ mapa_copaiba
 ```
 
 ## 3º Sucupira
+
+```{r}
+
+# Produtos mais citados 
+
+sucupira_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+  mutate(
+    nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+   filter(nome_popular == 'Sucupira') %>% # Filtrar somente os valores únicos
+  group_by(nome_popular, name_muni) %>% # Agrupar por município e espécie
+  summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
+  arrange(desc(freq)) %>% # Ordenar de forma decrescente
+  rename("nome_municipio" = name_muni) %>%
+  st_drop_geometry()
+
+# print( 
+#   sucupira_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
+#   ) # 34
+
+
+# distribuição espacial 
+
+mapa_sucupira <- sucupira_freq_respostas_bio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 35, 5),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Sucupira",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_sucupira
+
+```
+
 ## 4º Pequi
+
+```{r}
+
+# Produtos mais citados 
+
+pequi_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+  mutate(
+    nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+   filter(nome_popular == 'Pequi') %>% # Filtrar somente os valores únicos
+  group_by(nome_popular, name_muni) %>% # Agrupar por município e espécie
+  summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
+  arrange(desc(freq)) %>% # Ordenar de forma decrescente
+  rename("nome_municipio" = name_muni) %>%
+  st_drop_geometry()
+
+# print( 
+#   pequi_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
+#   ) # 66
+
+
+# distribuição espacial 
+
+mapa_pequi <- pequi_freq_respostas_bio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 70, 10),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Pequi",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_pequi
+
+```
+
 ## 5º Jatobá
+
+```{r}
+
+
+# Produtos mais citados 
+
+jatoba_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+  mutate(
+    nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+   filter(nome_popular == 'Jatobá') %>% # Filtrar somente os valores únicos
+  group_by(nome_popular, name_muni) %>% # Agrupar por município e espécie
+  summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
+  arrange(desc(freq)) %>% # Ordenar de forma decrescente
+  rename("nome_municipio" = name_muni) %>%
+  st_drop_geometry()
+
+# print( 
+#   jatoba_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
+#   ) # 44
+
+
+# distribuição espacial 
+
+mapa_jatoba <- jatoba_freq_respostas_bio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 45, 5),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Jatobá",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_jatoba
+
+
+```
+
 ## 6º Guariroba
 
+```{r}
 
+# Produtos mais citados 
+
+guariroba_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+  mutate(
+    nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+   filter(nome_popular == 'Guariroba') %>% # Filtrar somente os valores únicos
+  group_by(nome_popular, name_muni) %>% # Agrupar por município e espécie
+  summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
+  arrange(desc(freq)) %>% # Ordenar de forma decrescente
+  rename("nome_municipio" = name_muni) %>%
+  st_drop_geometry()
+
+# print( 
+#   guariroba_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
+#   ) # 130
+
+
+# distribuição espacial 
+
+mapa_guariroba <- guariroba_freq_respostas_bio_ride %>% 
+  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 130, 15),
+    direction = 1,
+    palette = "YlGnBu"
+  ) + 
+  labs(
+    title = "Distribuição Espacial do Jatobá",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1.5, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+mapa_guariroba
+
+```
 
 ## Quais as espécies (produtos) mais usadas por município?
 
