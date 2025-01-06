@@ -4,6 +4,7 @@ author: "Rogerio Vidal de Siqueira"
 date: "`r format(Sys.Date(),'%d/%m/%Y')`"
 ---
 
+
 ```{r sets, message=FALSE, warning=FALSE}
 
 # PRE-SETS ----
@@ -27,6 +28,14 @@ pacman::p_load(tidyverse, # pacote para manipulação de dados
 
 # Carregar funções 
 source("util/funcoes.R")
+
+# Ajuste flaxtable das casas decimais - TABELAS FLAXTABLE
+set_flextable_defaults(
+  digits = 2,
+  decimal.mark = ",",
+  big.mark = ".",
+  na_str = "<na>"
+)
 
 #pasta=paste0("Saidas-Exercicios-", Sys.Date()) #cria uma pasta para as saídas do dia
 #if(!dir.exists(pasta)) dir.create(pasta) #cria uma pasta para as saídas do dia
@@ -208,33 +217,6 @@ tab_bio_taxon
 
 ```
 
-## Verificar a altura (HT) das 10 espécies mais altas
-
-```{r}
-
-tab_bio_taxon %>% 
-  arrange(desc(HT)) %>%
-  head(10) 
-
-```
-
-## Distribuir a alturas das espécies
-
-```{r, warning = FALSE}
-
-tab_bio_taxon %>%
-  ggplot() +
-  geom_histogram(aes(x = HT), bins = 30, fill = "blue", color = "black", alpha = 0.7) +
-  geom_vline(aes(xintercept = mean(HT, na.rm = TRUE)), color = "red", linetype = "dashed", size = 1) +
-  theme_minimal() +
-  labs(
-    title = "Distribuição de HT",
-    x = "Altura (HT)",
-    y = "Frequência"
-  )
-
-```
-
 ## Listar municípios que não foram contemplados pelo IFN
 
 ```{r}
@@ -259,6 +241,9 @@ mun_socio_sem_dados_IFN <- mun_ride %>%
 
 mun_socio_sem_dados_IFN
 
+geo_mun_socio_sem_dados_IFN <- mun_ride %>%
+  filter(!name_muni %in% tab_socio_ride$name_muni) %>%
+  select(name_muni, name_state) 
 
 
 
@@ -277,13 +262,13 @@ tab_bio_taxon_ride <- tab_bio_taxon %>%
 
 ```
 
-# Visualizar dados processados e relacionados
+# Visualizar dados processados e relacionados: Biofísico
 
 ```{r warning=FALSE, message=FALSE}
 
 
 # Criação de um mapa combinando os dois objetos
-map_combinado <- ggplot() + 
+map_combinado_bio <- ggplot() + 
   geom_sf(data = mun_ride, fill = "gray90", color = "black") + # Camada de municípios
   geom_sf_pattern(  # Camada de municípios sem dados
                   data= geo_mun_bio_sem_dados_IFN, pattern = "stripe",           # Tipo de padrão (stripe, crosshatch, etc.)
@@ -294,13 +279,93 @@ map_combinado <- ggplot() +
                   fill = "gray90",               # Cor de fundo
                   pattern_color = "black") +     # Cor das linhas do padrão
  
-  geom_sf(data = tab_bio_taxon_ride, color = "blue", size = 1) + # Camada de pontos espacializados
+  geom_sf(data = tab_bio_taxon_ride, color = "green3", size = 1) + # Camada de pontos espacializados
   theme_minimal()
 
 # Visualizar o mapa
-map_combinado
+map_combinado_bio
 
 ```
+
+# Contabilizar amostras por município: Biofísica
+
+```{r, warning=FALSE, message=FALSE}
+
+# Tabela Biofísica 
+amostras_bio <- tab_bio_taxon_ride %>% 
+  st_drop_geometry() %>%
+  group_by(name_muni) %>% 
+  summarise(Quantidade = n()) %>% 
+  arrange(desc(Quantidade)) 
+
+# Tabela com os tipos de usos
+
+flex_amostras_bio <- amostras_bio %>% 
+  st_drop_geometry() %>%
+  flextable() %>%
+  set_header_labels(
+    name_muni = "Município",
+    Quantidade = "Quantidade de Amostras"
+  )  %>%
+  bold(part="header") %>%
+  width( j = 1, width = 2.5) %>%
+  width( j = 2, width = 1.5) 
+
+flex_amostras_bio
+
+```
+
+# Visualizar dados processados e relacionados: Sociológico
+
+```{r, warning=FALSE, message=FALSE}
+
+# Criação de um mapa combinando os dois objetos
+map_combinado_socio <- ggplot() + 
+  geom_sf(data = mun_ride, fill = "gray90", color = "black") + # Camada de municípios
+  geom_sf_pattern(  # Camada de municípios sem dados
+                  data= geo_mun_socio_sem_dados_IFN, pattern = "stripe",           # Tipo de padrão (stripe, crosshatch, etc.)
+                  pattern_angle = 45,            # Ângulo das hachuras
+                  pattern_density = 0.01,        # Densidade das linhas
+                  pattern_spacing = 0.02,        # Espaçamento entre as linhas
+                  pattern_size = 0.1,        # Espessura das linhas (bem finas)
+                  fill = "gray90",               # Cor de fundo
+                  pattern_color = "black") +     # Cor das linhas do padrão
+ 
+  geom_sf(data = tab_socio_ride, color = "orange", size = 1) + # Camada de pontos espacializados
+  theme_minimal()
+
+# Visualizar o mapa
+map_combinado_socio
+
+```
+
+# Contabilizar amostras por município: Sociológica 
+```{r}
+
+# Tabela Sociológica
+amostras_socio <- tab_socio_ride %>%
+  st_drop_geometry() %>%
+  group_by(name_muni) %>%
+  summarise(Quantidade = n()) %>%
+  arrange(desc(Quantidade)) 
+
+# Tabela com os tipos de usos
+
+flex_amostras_socio <- amostras_socio %>% 
+  st_drop_geometry() %>%
+  flextable() %>%
+  set_header_labels(
+    name_muni = "Município",
+    Quantidade = "Quantidade de Amostras"
+  )  %>%
+  bold(part="header") %>%
+  width( j = 1, width = 2.5) %>%
+  width( j = 2, width = 1.5)
+
+flex_amostras_socio
+
+```
+
 
 ```{r, echo=F}
 
@@ -349,7 +414,7 @@ map_combinado
 
 ## Frequencia de espécies na tabela Biofísico. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 
 # Tipos de usos da tabela Sociológica 
 registros_bio <- tab_bio_taxon_ride %>% # Tabela Sociológica do IFN
@@ -389,7 +454,7 @@ flex_registros_bio
 
 ## Tipos de usos presente na tabela Sociológica
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 
 # Tipos de usos da tabela Sociológica 
 tipos_usos <- tab_socio_ride %>% # Tabela Sociológica do IFN
@@ -419,7 +484,7 @@ flex_tabela_usos
 ```
 
 ## Quais são os produtos mais citados na tabela Sociológica?
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # Produtos mais citados 
 produtos_mais_citados <- tab_socio_ride %>% # Tabela Sociológica do IFN
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores únicos
@@ -471,10 +536,16 @@ pequi_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica
 
 # distribuição espacial 
 
+
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% pequi_frequencia_resposta_socio_ride$nome_municipio) %>%
+  select(name_muni, name_state) 
+
 mapa_pequi <- pequi_frequencia_resposta_socio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 65, 10),
@@ -525,10 +596,15 @@ sucupira_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológ
 
 # distribuição espacial 
 
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% sucupira_frequencia_resposta_socio_ride$nome_municipio) %>%
+  select(name_muni, name_state) 
+
 mapa_sucupira <- sucupira_frequencia_resposta_socio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 55, 10),
@@ -577,10 +653,15 @@ jatoba_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológic
 
 # distribuição espacial 
 
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% jatoba_frequencia_resposta_socio_ride$nome_municipio) %>%
+  select(name_muni, name_state) 
+
 mapa_jatoba <- jatoba_frequencia_resposta_socio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+    geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 55, 10),
@@ -628,10 +709,15 @@ caju_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica 
 
 # distribuição espacial 
 
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% caju_frequencia_resposta_socio_ride$nome_municipio) %>%
+  select(name_muni, name_state) 
+
 mapa_caju <- caju_frequencia_resposta_socio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 30, 5),
@@ -680,10 +766,15 @@ mangaba_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológi
 
 # distribuição espacial 
 
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% mangaba_frequencia_resposta_socio_ride$nome_municipio) %>%
+  select(name_muni, name_state) 
+
 mapa_mangaba <- mangaba_frequencia_resposta_socio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 40, 5),
@@ -730,10 +821,15 @@ baru_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica 
 
 # distribuição espacial 
 
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% baru_frequencia_resposta_socio_ride$nome_municipio) %>%
+  select(name_muni, name_state) 
+
 mapa_baru <- baru_frequencia_resposta_socio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = frequencia, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 45, 5),
@@ -764,7 +860,7 @@ mapa_baru
 
 ## Quais a espécie mais usadas por município?
 
-```{r analise-sociologica-especies-mais-usadas-municipio}
+```{r analise-sociologica-especies-mais-usadas-municipio, warning=FALSE, message=FALSE}
 
 especie_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
   filter(!`NOME DESCRITO NO LSA` == 'Sem informação') %>% # Filtrar somente os valores válidos
@@ -824,7 +920,7 @@ produtos_bio_ride <- tab_bio_taxon_ride %>%
 
 ## Quais as espécies (produtos) mais usados ?
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 
 # Nomes Populares 
 df_produtos_nome_populares <- produtos %>% 
@@ -884,34 +980,27 @@ copaiba_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica d
 
 
 # Municípios sem dados
-sem_dados <- mun_ride %>%
+geo_sem_dados <- mun_ride %>%
   filter(!name_muni %in% copaiba_freq_respostas_bio_ride$nome_municipio) %>%
   select(name_muni, name_state)
 
-# print(
-#   copaiba_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
-#   ) # 89
+print(
+  copaiba_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
+  ) # 89
 
 # distribuição espacial 
 
 mapa_copaiba <- copaiba_freq_respostas_bio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
-  geom_sf_pattern(  # Camada de municípios sem dados
-                  data= sem_dados, pattern = "stripe",           # Tipo de padrão (stripe, crosshatch, etc.)
-                  pattern_angle = 45,            # Ângulo das hachuras
-                  pattern_density = 0.01,        # Densidade das linhas
-                  pattern_spacing = 0.02,        # Espaçamento entre as linhas
-                  pattern_size = 0.1,        # Espessura das linhas (bem finas)
-                  fill = "gray90",               # Cor de fundo
-                  pattern_color = "black") +     # Cor das linhas do padrão
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
-    breaks = seq(0, 100, 20),
+    breaks = seq(0, 90, 20),
     direction = 1,
     palette = "YlGnBu"
-  ) + 
+  ) +
   labs(
     title = "Distribuição Espacial do Copaiba",
     subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
@@ -952,19 +1041,26 @@ murici_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do
   st_drop_geometry()
 
 
-# print(
-#   murici_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
-#   ) # 34
+print(
+  murici_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
+  )
+
 
 # distribuição espacial 
+
+# Municípios sem dados
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% murici_freq_respostas_bio_ride$nome_municipio) %>%
+  select(name_muni, name_state)
 
 mapa_murici <- murici_freq_respostas_bio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
-    breaks = seq(0, 160, 20),
+    breaks = seq(0, 160, 25),
     direction = 1,
     palette = "YlGnBu"
   ) + 
@@ -986,7 +1082,7 @@ mapa_murici <- murici_freq_respostas_bio_ride %>%
     plot.subtitle = element_text(hjust = 0.5)
   )
 
-mapa_copaiba
+mapa_murici
 
 ```
 
@@ -1014,10 +1110,16 @@ sucupira_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica 
 
 # distribuição espacial 
 
+# Municípios sem dados
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% sucupira_freq_respostas_bio_ride$nome_municipio) %>%
+  select(name_muni, name_state)
+
 mapa_sucupira <- sucupira_freq_respostas_bio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+    geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 35, 5),
@@ -1070,10 +1172,16 @@ pequi_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do 
 
 # distribuição espacial 
 
+# Municípios sem dados
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% pequi_freq_respostas_bio_ride$nome_municipio) %>%
+  select(name_muni, name_state)
+
 mapa_pequi <- pequi_freq_respostas_bio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+    geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 70, 10),
@@ -1127,10 +1235,16 @@ jatoba_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do
 
 # distribuição espacial 
 
+# Municípios sem dados
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% jatoba_freq_respostas_bio_ride$nome_municipio) %>%
+  select(name_muni, name_state)
+
 mapa_jatoba <- jatoba_freq_respostas_bio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+    geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 45, 5),
@@ -1184,13 +1298,19 @@ guariroba_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica
 
 # distribuição espacial 
 
+# Municípios sem dados
+geo_sem_dados <- mun_ride %>%
+  filter(!name_muni %in% guariroba_freq_respostas_bio_ride$nome_municipio) %>%
+  select(name_muni, name_state)
+
 mapa_guariroba <- guariroba_freq_respostas_bio_ride %>% 
   left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
-  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "#e6e6e6") +
+    geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
   scale_fill_fermenter(
     name = "",
-    breaks = seq(0, 130, 15),
+    breaks = seq(0, 130, 20),
     direction = 1,
     palette = "YlGnBu"
   ) + 
@@ -1218,7 +1338,7 @@ mapa_guariroba
 
 ## Quais as espécies (produtos) mais usadas por município?
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 
 # Produtos mais citados 
 produtos_bio_mais_citados_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
