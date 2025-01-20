@@ -626,8 +626,15 @@ flex_formatado_socio_uso_mun <- df_formatado_socio_uso_mun %>%
 ## 1º Pequi
 
 ```{r}
+df_1 <- freq_especie_resposta(tab_socio_ride, "Pequi")
+
+mapa <- mapa_tabela_sociologica(mun_ride, df_1, seq(0, 65, 10))
+
+mapa
+```
 
 
+```{r}
 
 # Produtos mais citados 
 pequi_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica do IFN
@@ -641,8 +648,6 @@ pequi_frequencia_resposta_socio_ride <- tab_socio_ride %>% # Tabela Sociológica
          "nome_municipio" = name_muni)
 
 # distribuição espacial 
-
-
 geo_sem_dados <- mun_ride %>%
   filter(!name_muni %in% pequi_frequencia_resposta_socio_ride$nome_municipio) %>%
   select(name_muni, name_state) 

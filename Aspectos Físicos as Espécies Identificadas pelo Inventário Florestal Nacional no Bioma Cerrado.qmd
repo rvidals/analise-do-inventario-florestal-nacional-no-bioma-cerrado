@@ -33,7 +33,6 @@ source("util/funcoes.R")
 
 ```
 
-
 ## Carregar dados da malha municipal dos municípios que fazem parte da Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)
 
 ```{r , warning=FALSE, message=FALSE}
