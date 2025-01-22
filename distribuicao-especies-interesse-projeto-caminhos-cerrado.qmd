@@ -1,5 +1,5 @@
 ---
-title: "Distribução de Espécies de Interesse no Projeto Caminhos da Resturação com foco na RIDE-DF"
+title: "Distribução de Espécies de Interesse no Projeto Caminhos da Resturação com foco no Bioma Cerrado"
 author: "Rogerio Vidal de Siqueira"
 date: "`r format(Sys.Date(),'%d/%m/%Y')`"
 ---
@@ -37,7 +37,7 @@ set_flextable_defaults(
   na_str = "<na>"
 )
 
-pasta = "./TABELAS/RIDE" #cria uma pasta para as saídas do dia
+pasta = "./TABELAS/Cerrado" #cria uma pasta para as saídas do dia
 if(!dir.exists(pasta)) dir.create(pasta) #cria uma pasta para as saídas do dia
 
 ```
@@ -70,6 +70,25 @@ mun_ride <- read_municipality(
   )%>%
   filter(abbrev_state == "GO" | abbrev_state == "DF"| abbrev_state == "MG") %>%  
   filter(name_muni %in% lista_mun_RIDE)
+
+mun_cerrado <- read_municipality(
+  year = 2022,
+  showProgress = FALSE
+) %>% 
+  filter(abbrev_state %in% c("GO", "DF", "MG", "SP", "TO", "PA", "MT", "MS", "BA", "MA", "PI", "PR"))
+
+uf_cerrado <- read_state(
+  year = 2010, 
+  showProgress = FALSE
+  ) %>% 
+  filter(abbrev_state %in% c("GO", "DF", "MG", "SP", "TO", "PA", "MT", "MS", "BA", "MA", "PI", "PR"))
+
+limite_cerrado <- read_biomes(
+  year = 2019,
+  simplified = TRUE,
+  showProgress = FALSE
+) %>% 
+  filter(name_biome == "Cerrado" & code_biome == 3)
 
 # Exportar os municípios em um arquivo vetorial (GeoPackage)
 
@@ -136,34 +155,24 @@ geo_bio <- tab_bio %>%
   st_as_sf(coords = c("Long", "Lat"), crs = 4326)
 
 
-# Filtrar somente os dados do DF, GO e MG
+# Filtrar somente os municípios do Cerrado
+geo_bio_cerrado <- geo_bio %>% 
+  filter(grepl("GO|DF|MG|SP|TO|PA|MT|MS|BA|MA|PI|PR", LOTE))
 
-geo_soc_DFGOMG <- geo_soc %>% 
-  filter(grepl("GO|DF|MG", LOTE))
+# print(dim(geo_soc_cerrado))
+print(dim(geo_bio_cerrado))
 
-geo_bio_DFGOMG <- geo_bio %>% 
-  filter(grepl("GO|DF|MG", LOTE))
 
-print(dim(geo_soc_DFGOMG))
-print(dim(geo_bio_DFGOMG))
+# Relação espacial entre os municípios da RIDE-DF e os dados do IFN Cerrado
 
-# Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)
-
-tab_bio_ride <- geo_bio_DFGOMG %>% # Tabela Biofísica do IFN
+tab_bio_cerrado <- geo_bio_cerrado %>% # Tabela Biofísica do IFN
   st_transform(crs = 4674) %>%
-  st_join(mun_ride) %>%
+  st_join(mun_cerrado) %>%
   filter(!is.na(name_muni))
-
-
-tab_socio_ride <- geo_soc_DFGOMG %>% # Tabela Sociológica do IFN
-  st_transform(crs = 4674) %>%
-  st_join(mun_ride) %>%
-  filter(!is.na(name_muni))
-
 
 # Na coluna TAXON_ID, existem valores que não são numéricos, então é necessário filtrar somente os valores numéricos. Os valores que aparecem são: Em análise, Indivíduo Morto. Como essa coluna é chave primária para juntar com a tabela Taxon, é necessário filtrar somente os valores numéricos.
 
-geo_bio_DFGOMG_filtrado <- geo_bio_DFGOMG %>% 
+geo_bio_cerrado_filtrado <- geo_bio_cerrado %>% 
   mutate(num_check = as.numeric(TAXON_ID)) %>% # Verificar se é numérico
   filter(!is.na(num_check)) %>% # Filtrar somente os valores numéricos
   select(-num_check)
@@ -189,8 +198,10 @@ tab_taxon <- download_e_leitura_txt(url_taxon, "taxon.txt")
 tab_taxon <- tab_taxon %>% 
   mutate(taxonID = as.character(taxonID))
 
-tab_bio_taxon <- geo_bio_DFGOMG_filtrado %>% 
+tab_bio_taxon_c <- geo_bio_cerrado_filtrado %>%
   left_join(tab_taxon, by = c("TAXON_ID" = "taxonID"))
+
+tab_bio_taxon_c
 
 ```
 
@@ -198,90 +209,109 @@ tab_bio_taxon <- geo_bio_DFGOMG_filtrado %>%
 
 ```{r}
 
-# Biofísico
-mun_bio_sem_dados_IFN <- mun_ride %>%
-  filter(!name_muni %in% tab_bio_ride$name_muni) %>%
+# Cerrado (Biofísico)
+
+mun_bio_sem_dados_IFN_cerrado <- mun_cerrado %>%
+  filter(!name_muni %in% tab_bio_cerrado$name_muni) %>%
   select(name_muni, name_state) %>% 
   st_drop_geometry()
 
-geo_mun_bio_sem_dados_IFN <- mun_ride %>%
-  filter(!name_muni %in% tab_bio_ride$name_muni) %>%
+geo_mun_bio_sem_dados_IFN_cerrado <- mun_cerrado %>%
+  filter(!name_muni %in% tab_bio_cerrado$name_muni) %>%
   select(name_muni, name_state)
+
+
 
 ```
 
-## Relação espacial entre os municípios da RIDE-DF e os dados do IFN (GO/DF/MG)
+## Relação espacial entre os municípios do Cerrado e os dados do IFN
 
 ```{r}
 
-tab_bio_taxon_ride <- tab_bio_taxon %>%
+tab_bio_taxon_cerrado <- tab_bio_taxon_c %>%
   st_transform(crs = 4674) %>% # Transformar o sistema de coordenadas
-  st_join(mun_ride) %>% # Juntar com a tabela de municípios da RIDE-DF e obter o nome do município
+  st_join(mun_cerrado) %>% # Juntar com a tabela de municípios da RIDE-DF e obter o nome do município
   filter(!is.na(name_muni))
+
+
 
 ```
 
 # Visualizar dados processados e relacionados: Biofísico
 
+```{r}
+# Criação de um mapa combinando os dois objetos
+map_combinado_bio_cerrado1 <- ggplot() + 
+  geom_sf(data = uf_cerrado, fill = "gray90", color = "gray", pattern_size = 0.1) + # Camada de municípios
+  geom_sf(data = tab_bio_taxon_cerrado, color = "green3", size = 1) + # Camada de municípios
+  geom_sf(data = limite_cerrado, fill = "transparent", color = "black", pattern_size = 0.1) + # Camada de Bioma
+  theme_minimal()
+
+# Visualizar o mapa
+map_combinado_bio_cerrado1
+```
+
 ```{r warning=FALSE, message=FALSE}
 
 
 # Criação de um mapa combinando os dois objetos
-map_combinado_bio <- ggplot() + 
-  geom_sf(data = mun_ride, fill = "gray90", color = "black") + # Camada de municípios
-  geom_sf_pattern(  # Camada de municípios sem dados
-                  data= geo_mun_bio_sem_dados_IFN, pattern = "stripe",           # Tipo de padrão (stripe, crosshatch, etc.)
-                  pattern_angle = 45,            # Ângulo das hachuras
-                  pattern_density = 0.01,        # Densidade das linhas
-                  pattern_spacing = 0.02,        # Espaçamento entre as linhas
-                  pattern_size = 0.1,        # Espessura das linhas (bem finas)
-                  fill = "gray90",               # Cor de fundo
-                  pattern_color = "black") +     # Cor das linhas do padrão
- 
-  geom_sf(data = tab_bio_taxon_ride, color = "green3", size = 1) + # Camada de pontos espacializados
-  theme_minimal()
+# map_combinado_bio <- ggplot() + 
+#   geom_sf(data = mun_ride, fill = "gray90", color = "black") + # Camada de municípios
+#   geom_sf_pattern(  # Camada de municípios sem dados
+#                   data= geo_mun_bio_sem_dados_IFN, pattern = "stripe",           # Tipo de padrão (stripe, crosshatch, etc.)
+#                   pattern_angle = 45,            # Ângulo das hachuras
+#                   pattern_density = 0.01,        # Densidade das linhas
+#                   pattern_spacing = 0.02,        # Espaçamento entre as linhas
+#                   pattern_size = 0.1,        # Espessura das linhas (bem finas)
+#                   fill = "gray90",               # Cor de fundo
+#                   pattern_color = "black") +     # Cor das linhas do padrão
+#  
+#   geom_sf(data = tab_bio_taxon_ride, color = "green3", size = 1) + # Camada de pontos espacializados
+#   theme_minimal()
 
 # Visualizar o mapa
-map_combinado_bio
+# map_combinado_bio
 
 ```
 
-# Contabilizar amostras por município: Biofísica (RIDE-DF)
+# Contabilizar amostras por município: Biofísica (Cerrado)
 
 ```{r, message=FALSE, warning=FALSE}
 
 # Tabela Biofísica 
-amostras_bio <- tab_bio_taxon_ride %>% 
+amostras_bio_cerrado <- tab_bio_taxon_cerrado %>% 
   st_drop_geometry() %>%
-  group_by(name_muni) %>% 
+  group_by(name_muni, abbrev_state) %>% 
   summarise(Quantidade = n()) %>% 
   arrange(desc(Quantidade)) 
 
+
 # Tabela com os tipos de usos
 
-flex_amostras_bio <- amostras_bio %>% 
+flex_amostras_bio_cerrado <- amostras_bio_cerrado %>% 
   st_drop_geometry() %>%
   flextable() %>%
   set_header_labels(
     name_muni = "Município",
+    abbrev_state = "UF",
     Quantidade = "Quantidade de Amostras"
   )  %>%
   bold(part="header") %>%
   width( j = 1, width = 2.5) %>%
-  width( j = 2, width = 1.5) 
+  width( j = 3, width = 1.5) 
 
-flex_amostras_bio
+flex_amostras_bio_cerrado
 
 ```
 
 # TABELA BIOFÍSICO
 
-## Frequencia de espécies na tabela Biofísico (RIDE-DF)
+## Frequencia de espécies na tabela Biofísico (Cerrado)
 
 ```{r, warning=FALSE, message=FALSE}
 
-# Tipos de usos da tabela Sociológica 
-registros_bio <- tab_bio_taxon_ride %>% # Tabela Sociológica do IFN
+# Tipos de usos da tabela Biológica 
+registros_bio_cerrado <- tab_bio_taxon_cerrado %>% # Tabela Biológica do IFN
   filter(!is.na(scientificName)) %>% # Filtrar somente os valores únicos
   group_by(scientificName) %>% # Agrupar por município e espécie
   summarise(Quantidade = n()) %>%# Listar os tipos de uso
@@ -290,23 +320,23 @@ registros_bio <- tab_bio_taxon_ride %>% # Tabela Sociológica do IFN
 
 # Exportar a tabela
 
-registros_bio %>% 
+registros_bio_cerrado %>% 
   export(
-    "TABELAS/RIDE/registros_bio_ride.xlsx",
+    "TABELAS/Cerrado/registros_bio_cerrado.xlsx",
     col_names = TRUE
   )
 
 # Selecionar somente os 30 mais citados 
 
-registros_bio <- registros_bio %>% 
+registro_bio_cerrado <- registros_bio_cerrado %>% 
   head(30) # Listar os 30 mais citados
 
 # Total de Registros
-sum(registros_bio$Quantidade)
+sum(registros_bio_cerrado$Quantidade)
 
 # Tabela com os tipos de usos
 
-flex_registros_bio <- registros_bio %>% 
+flex_registros_bio_cerrado <- registros_bio_cerrado %>% 
   st_drop_geometry() %>%
   flextable() %>%
   set_header_labels(
@@ -319,16 +349,16 @@ flex_registros_bio <- registros_bio %>%
   width( j = 1, width = 2.5) %>%
   width( j = 2, width = 2.5) %>%
   add_footer_lines(
-    "Estão destacados as 30 espécies com mais registros na tabela Biofísica do IFN."
+    "Estão destacados as 5 espécies com mais registros na tabela Biofísica do IFN. Essa tabela apresenta somente as 30 espécies com mais registros."
   )
   
-flex_registros_bio
+flex_registros_bio_cerrado
 
 ```
 
 # ESPÉCIES SELECIONADAS NA TABELA BIOFÍSICA
 
-## Selecionar algumas espécies de produtos florestais não madeireiros (PFNM) na RIDE-DF
+## Selecionar algumas espécies de produtos florestais não madeireiros (PFNM) do Cerrado
 
 ```{r}
 
@@ -352,7 +382,7 @@ padrao <- paste(lista_produtos, collapse = "|")
 
 # Filtra as linhas do data frame 'tab_bio_taxon_ride'
 # que contêm algum dos gêneros em 'padrao' na coluna 'scientificName'.
-produtos_bio_ride <- tab_bio_taxon_ride %>%
+produtos_bio_cerrado <- tab_bio_taxon_cerrado %>%
   filter(str_detect(scientificName, padrao))
 
 # st_write(produtos_bio_ride, "produtos_bio_ride.gpkg", delete_dsn = TRUE, driver = "GPKG")
@@ -369,7 +399,7 @@ df_produtos_nome_populares <- produtos %>%
   )
 
 # Produtos mais citados 
-produtos_bio_mais_citados <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+produtos_bio_mais_citados_cerrado <- produtos_bio_cerrado %>% # Tabela Sociológica do IFN
   group_by(scientificName) %>% # Agrupar por município e espécie
   summarise(Quantidade = n()) %>%# Listar os tipos de uso
   arrange(desc(Quantidade)) %>% # Ordenar de forma decrescente
@@ -379,7 +409,7 @@ produtos_bio_mais_citados <- produtos_bio_ride %>% # Tabela Sociológica do IFN
   head(20) # Listar os 20 mais citados
 
 # Tabela
-tabela_produtos_bio_mais_citados <- produtos_bio_mais_citados %>% 
+tabela_produtos_bio_mais_citados_cerrado <- produtos_bio_mais_citados_cerrado %>% 
   st_drop_geometry() %>%
   select(scientificName, Nome_Popular, Quantidade) %>%
   flextable() %>%
@@ -398,60 +428,60 @@ tabela_produtos_bio_mais_citados <- produtos_bio_mais_citados %>%
     "Foi realizada uma seleção inicial de 18 espécies, e com base nessa seleção, retornamos somente as 20 linhas com as espécies mais citadas (tab. Biofísica IFN) que estão apresentadas nessa tabela."
   )
 
-tabela_produtos_bio_mais_citados
+tabela_produtos_bio_mais_citados_cerrado
 ```
 
 ## Espacializar os 05 mais citados
 
-## 1º Murici
+## 1º Pimenta-de-macaco
 
 ```{r}
 
 # Produtos mais citados 
 
-murici_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+pimenta_freq_respostas_bio_cerrado <- produtos_bio_cerrado %>% # Tabela Sociológica do IFN
   mutate(
     nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
   ) %>%
-   filter(nome_popular == 'Murici') %>% # Filtrar somente os valores únicos
+   filter(nome_popular == 'Pimenta-de-macaco') %>% # Filtrar somente os valores únicos
   group_by(nome_popular, name_muni, abbrev_state) %>% # Agrupar por município e espécie
   summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(freq)) %>% # Ordenar de forma decrescente
   rename("nome_municipio" = name_muni) %>%
   st_drop_geometry()
 
-
-murici_freq_respostas_bio_ride %>% 
+pimenta_freq_respostas_bio_cerrado %>% 
   export(
-    "TABELAS/RIDE/murici_freq_respostas_bio_ride.xlsx",
+    "TABELAS/Cerrado/pimenta_freq_respostas_bio_cerrado2.xlsx",
     col_names = TRUE
   )
 
 # Municípios sem dados
-geo_sem_dados <- mun_ride %>%
-  filter(!name_muni %in% murici_freq_respostas_bio_ride$nome_municipio) %>%
+geo_sem_dados <- mun_cerrado %>%
+  filter(!name_muni %in% pimenta_freq_respostas_bio_cerrado$nome_municipio) %>%
   select(name_muni, name_state)
 
 # print(
-#   murici_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
-# ) 
+#   pimenta_freq_respostas_bio_cerrado %>% select(freq)  %>% pull() %>% max()
+#   ) # 150
 
 # distribuição espacial 
 
-mapa_murici <- murici_freq_respostas_bio_ride %>% 
-  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+mapa_pimenta <- pimenta_freq_respostas_bio_cerrado %>% 
+  left_join(mun_cerrado, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
   geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
   geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
+  geom_sf(data = limite_cerrado, fill = "transparent", color = "gray12") + # Camada de Bioma
   scale_fill_fermenter(
     name = "",
-    breaks = seq(0, 230, 25),
+    breaks = seq(0, 160, 20),
     direction = 1,
     palette = "YlGnBu"
   ) +
   labs(
-    title = "Distribuição Espacial do Murici",
-    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+    title = "Distribuição Espacial da Pimenta-de-Macaco",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (Cerrado)"
   ) +
   theme_map() + 
   theme(
@@ -467,59 +497,57 @@ mapa_murici <- murici_freq_respostas_bio_ride %>%
     plot.subtitle = element_text(hjust = 0.5)
   )
 
-mapa_murici
 
+mapa_pimenta
 ```
 
-## 2º Sucupira 
+## 2º Babaçu
 
 ```{r}
 
-# Produtos mais citados 
-
-sucupira_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+babacu_freq_respostas_bio_cerrado <- produtos_bio_cerrado %>% # Tabela Sociológica do IFN
   mutate(
     nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
   ) %>%
-   filter(nome_popular == 'Sucupira') %>% # Filtrar somente os valores únicos
+   filter(nome_popular == 'Babaçu') %>% # Filtrar somente os valores únicos
   group_by(nome_popular, name_muni, abbrev_state) %>% # Agrupar por município e espécie
   summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(freq)) %>% # Ordenar de forma decrescente
   rename("nome_municipio" = name_muni) %>%
   st_drop_geometry()
 
-
-sucupira_freq_respostas_bio_ride %>% 
+babacu_freq_respostas_bio_cerrado %>%
   export(
-    "TABELAS/RIDE/sucupira_freq_respostas_bio_ride.xlsx",
+    "TABELAS/Cerrado/babacu_freq_respostas_bio_cerrado.xlsx",
     col_names = TRUE
   )
 
 # Municípios sem dados
-geo_sem_dados <- mun_ride %>%
-  filter(!name_muni %in% sucupira_freq_respostas_bio_ride$nome_municipio) %>%
+geo_sem_dados <- mun_cerrado %>%
+  filter(!name_muni %in% babacu_freq_respostas_bio_cerrado$nome_municipio) %>%
   select(name_muni, name_state)
 
 # print(
-#   sucupira_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
-# )
+#   babacu_freq_respostas_bio_cerrado %>% select(freq)  %>% pull() %>% max()
+#   ) # 495
 
 # distribuição espacial 
 
-mapa_sucupira <- sucupira_freq_respostas_bio_ride %>% 
-  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+mapa_babacu <- babacu_freq_respostas_bio_cerrado %>% 
+  left_join(mun_cerrado, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
   geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
   geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
+  geom_sf(data = limite_cerrado, fill = "transparent", color = "gray12") + # Camada de Bioma
   scale_fill_fermenter(
     name = "",
-    breaks = seq(0, 35, 5),
+    breaks = seq(0, 500, 75),
     direction = 1,
     palette = "YlGnBu"
   ) +
   labs(
-    title = "Distribuição Espacial do Sucupira",
-    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+    title = "Distribuição Espacial da Babaçu",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (Cerrado)"
   ) +
   theme_map() + 
   theme(
@@ -535,17 +563,83 @@ mapa_sucupira <- sucupira_freq_respostas_bio_ride %>%
     plot.subtitle = element_text(hjust = 0.5)
   )
 
-mapa_sucupira
+
+mapa_babacu
 
 ```
 
-## 3º Pequi
+## 3º Tingui
 
 ```{r}
 
-# Produtos mais citados 
+tingui_freq_respostas_bio_cerrado <- produtos_bio_cerrado %>% # Tabela Sociológica do IFN
+  mutate(
+    nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+   filter(nome_popular == 'Tingui') %>% # Filtrar somente os valores únicos
+  group_by(nome_popular, name_muni, abbrev_state) %>% # Agrupar por município e espécie
+  summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
+  arrange(desc(freq)) %>% # Ordenar de forma decrescente
+  rename("nome_municipio" = name_muni) %>%
+  st_drop_geometry()
 
-pequi_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+tingui_freq_respostas_bio_cerrado %>%
+  export(
+    "TABELAS/Cerrado/tingui_freq_respostas_bio_cerrado.xlsx",
+    col_names = TRUE
+  )
+
+# Municípios sem dados
+geo_sem_dados <- mun_cerrado %>%
+  filter(!name_muni %in% tingui_freq_respostas_bio_cerrado$nome_municipio) %>%
+  select(name_muni, name_state)
+
+# print(
+#   tingui_freq_respostas_bio_cerrado %>% select(freq)  %>% pull() %>% max()
+#   ) # 64
+
+# distribuição espacial 
+
+mapa_tingui <- tingui_freq_respostas_bio_cerrado %>% 
+  left_join(mun_cerrado, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
+  geom_sf(data = limite_cerrado, fill = "transparent", color = "gray12") + # Camada de Bioma
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 65, 10),
+    direction = 1,
+    palette = "YlGnBu"
+  ) +
+  labs(
+    title = "Distribuição Espacial da Tingui",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (Cerrado)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+
+mapa_tingui
+
+```
+
+## 4º Pequi
+
+```{r}
+
+pequi_freq_respostas_bio_cerrado <- produtos_bio_cerrado %>% # Tabela Sociológica do IFN
   mutate(
     nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
   ) %>%
@@ -557,28 +651,29 @@ pequi_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do 
   st_drop_geometry()
 
 
-pequi_freq_respostas_bio_ride %>% 
+pequi_freq_respostas_bio_cerrado %>%
   export(
-    "TABELAS/RIDE/pequi_freq_respostas_bio_ride.xlsx",
+    "TABELAS/Cerrado/pequi_freq_respostas_bio_cerrado.xlsx",
     col_names = TRUE
   )
 
 # Municípios sem dados
-geo_sem_dados <- mun_ride %>%
-  filter(!name_muni %in% pequi_freq_respostas_bio_ride$nome_municipio) %>%
+geo_sem_dados <- mun_cerrado %>%
+  filter(!name_muni %in% pequi_freq_respostas_bio_cerrado$nome_municipio) %>%
   select(name_muni, name_state)
 
 # print(
-#   pequi_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
-# )
+#   pequi_freq_respostas_bio_cerrado %>% select(freq)  %>% pull() %>% max()
+#   ) # 64
 
 # distribuição espacial 
 
-mapa_pequi <- pequi_freq_respostas_bio_ride %>% 
-  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+mapa_pequi <- pequi_freq_respostas_bio_cerrado %>% 
+  left_join(mun_cerrado, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
   geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
   geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
+  geom_sf(data = limite_cerrado, fill = "transparent", color = "gray12") + # Camada de Bioma
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 70, 10),
@@ -586,8 +681,8 @@ mapa_pequi <- pequi_freq_respostas_bio_ride %>%
     palette = "YlGnBu"
   ) +
   labs(
-    title = "Distribuição Espacial do Pequi",
-    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+    title = "Distribuição Espacial da Pequi",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (Cerrado)"
   ) +
   theme_map() + 
   theme(
@@ -603,50 +698,49 @@ mapa_pequi <- pequi_freq_respostas_bio_ride %>%
     plot.subtitle = element_text(hjust = 0.5)
   )
 
+
 mapa_pequi
 
 ```
 
-## 4º Pimenta-de-macaco
+## 5º Sucupira
 
 ```{r}
 
-# Produtos mais citados 
-
-pimenta_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+sucupira_freq_respostas_bio_cerrado <- produtos_bio_cerrado %>% # Tabela Sociológica do IFN
   mutate(
     nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
   ) %>%
-   filter(nome_popular == 'Pimenta-de-macaco') %>% # Filtrar somente os valores únicos
+   filter(nome_popular == 'Sucupira') %>% # Filtrar somente os valores únicos
   group_by(nome_popular, name_muni, abbrev_state) %>% # Agrupar por município e espécie
   summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(freq)) %>% # Ordenar de forma decrescente
   rename("nome_municipio" = name_muni) %>%
   st_drop_geometry()
 
-
-pimenta_freq_respostas_bio_ride %>% 
+sucupira_freq_respostas_bio_cerrado %>%
   export(
-    "TABELAS/RIDE/pimenta_freq_respostas_bio_ride.xlsx",
+    "TABELAS/Cerrado/sucupira_freq_respostas_bio_cerrado.xlsx",
     col_names = TRUE
   )
 
 # Municípios sem dados
-geo_sem_dados <- mun_ride %>%
-  filter(!name_muni %in% pimenta_freq_respostas_bio_ride$nome_municipio) %>%
+geo_sem_dados <- mun_cerrado %>%
+  filter(!name_muni %in% sucupira_freq_respostas_bio_cerrado$nome_municipio) %>%
   select(name_muni, name_state)
 
 # print(
-#   pimenta_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
-# )
+#   sucupira_freq_respostas_bio_cerrado %>% select(freq)  %>% pull() %>% max()
+#   ) # 89
 
 # distribuição espacial 
 
-mapa_pimenta <- pimenta_freq_respostas_bio_ride %>% 
-  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+mapa_sucupira <- sucupira_freq_respostas_bio_cerrado %>% 
+  left_join(mun_cerrado, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
   geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
   geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
+  geom_sf(data = limite_cerrado, fill = "transparent", color = "gray12") + # Camada de Bioma
   scale_fill_fermenter(
     name = "",
     breaks = seq(0, 90, 10),
@@ -654,8 +748,8 @@ mapa_pimenta <- pimenta_freq_respostas_bio_ride %>%
     palette = "YlGnBu"
   ) +
   labs(
-    title = "Distribuição Espacial do Pimenta-de-macaco",
-    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+    title = "Distribuição Espacial da Sucupira",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (Cerrado)"
   ) +
   theme_map() + 
   theme(
@@ -671,61 +765,58 @@ mapa_pimenta <- pimenta_freq_respostas_bio_ride %>%
     plot.subtitle = element_text(hjust = 0.5)
   )
 
-mapa_pimenta
+
+mapa_sucupira
 
 ```
 
-
-## 5º Tingui
-
+## 6º Cajuzinho-do-cerrado
 
 ```{r}
 
-# Produtos mais citados 
-
-tingui_freq_respostas_bio_ride <- produtos_bio_ride %>% # Tabela Sociológica do IFN
+cajuzinho_freq_respostas_bio_cerrado <- produtos_bio_cerrado %>% # Tabela Sociológica do IFN
   mutate(
     nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
   ) %>%
-   filter(nome_popular == 'Tingui') %>% # Filtrar somente os valores únicos
+   filter(nome_popular == 'Cajuzinho-do-cerrado') %>% # Filtrar somente os valores únicos
   group_by(nome_popular, name_muni, abbrev_state) %>% # Agrupar por município e espécie
   summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
   arrange(desc(freq)) %>% # Ordenar de forma decrescente
   rename("nome_municipio" = name_muni) %>%
   st_drop_geometry()
 
-
-tingui_freq_respostas_bio_ride %>% 
+cajuzinho_freq_respostas_bio_cerrado %>%
   export(
-    "TABELAS/RIDE/tingui_freq_respostas_bio_ride.xlsx",
+    "TABELAS/Cerrado/cajuzinho_freq_respostas_bio_cerrado.xlsx",
     col_names = TRUE
   )
 
 # Municípios sem dados
-geo_sem_dados <- mun_ride %>%
-  filter(!name_muni %in% tingui_freq_respostas_bio_ride$nome_municipio) %>%
+geo_sem_dados <- mun_cerrado %>%
+  filter(!name_muni %in% cajuzinho_freq_respostas_bio_cerrado$nome_municipio) %>%
   select(name_muni, name_state)
 
 # print(
-  # tingui_freq_respostas_bio_ride %>% select(freq)  %>% pull() %>% max()
-# )
+#   cajuzinho_freq_respostas_bio_cerrado %>% select(freq)  %>% pull() %>% max()
+#   ) # 91
 
 # distribuição espacial 
 
-mapa_tingui <- tingui_freq_respostas_bio_ride %>% 
-  left_join(mun_ride, by = c("nome_municipio" = "name_muni")) %>% 
+mapa_cajuzinho <- cajuzinho_freq_respostas_bio_cerrado %>% 
+  left_join(mun_cerrado, by = c("nome_municipio" = "name_muni")) %>% 
   ggplot() +
   geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
   geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
+  geom_sf(data = limite_cerrado, fill = "transparent", color = "gray12") + # Camada de Bioma
   scale_fill_fermenter(
     name = "",
-    breaks = seq(0, 45, 5),
+    breaks = seq(0, 95, 15),
     direction = 1,
     palette = "YlGnBu"
   ) +
   labs(
-    title = "Distribuição Espacial do Tingui",
-    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (RIDE-DF)"
+    title = "Distribuição Espacial da Sucupira",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (Cerrado)"
   ) +
   theme_map() + 
   theme(
@@ -741,7 +832,74 @@ mapa_tingui <- tingui_freq_respostas_bio_ride %>%
     plot.subtitle = element_text(hjust = 0.5)
   )
 
-mapa_tingui
+
+mapa_cajuzinho
 
 ```
 
+## 7º Murici
+
+```{r}
+
+murici_freq_respostas_bio_cerrado <- produtos_bio_cerrado %>% # Tabela Sociológica do IFN
+  mutate(
+    nome_popular = associar_nome_popular(scientificName, df_produtos_nome_populares)
+  ) %>%
+   filter(nome_popular == 'Murici') %>% # Filtrar somente os valores únicos
+  group_by(nome_popular, name_muni, abbrev_state) %>% # Agrupar por município e espécie
+  summarise(freq = n(), .groups = 'drop') %>%# Listar os tipos de uso
+  arrange(desc(freq)) %>% # Ordenar de forma decrescente
+  rename("nome_municipio" = name_muni) %>%
+  st_drop_geometry()
+
+murici_freq_respostas_bio_cerrado %>%
+  export(
+    "TABELAS/Cerrado/murici_freq_respostas_bio_cerrado.xlsx",
+    col_names = TRUE
+  )
+
+# Municípios sem dados
+geo_sem_dados <- mun_cerrado %>%
+  filter(!name_muni %in% murici_freq_respostas_bio_cerrado$nome_municipio) %>%
+  select(name_muni, name_state)
+
+# print(
+#   murici_freq_respostas_bio_cerrado %>% select(freq)  %>% pull() %>% max()
+#   ) # 91
+
+# distribuição espacial 
+
+mapa_murici <- murici_freq_respostas_bio_cerrado %>% 
+  left_join(mun_cerrado, by = c("nome_municipio" = "name_muni")) %>% 
+  ggplot() +
+  geom_sf(data = geo_sem_dados, fill = "gray90", color = "grey70") + # Camada de municípios sem dados
+  geom_sf(aes(fill = freq, geometry = geom), lwd = 0.05, color = "grey70") +
+  geom_sf(data = limite_cerrado, fill = "transparent", color = "gray12") + # Camada de Bioma
+  scale_fill_fermenter(
+    name = "",
+    breaks = seq(0, 160, 20),
+    direction = 1,
+    palette = "YlGnBu"
+  ) +
+  labs(
+    title = "Distribuição Espacial da Sucupira",
+    subtitle = "Região Integrada de Desenvolvimento do Distrito Federal e Entorno (Cerrado)"
+  ) +
+  theme_map() + 
+  theme(
+    # Legend
+    legend.position = "top",
+    legend.justification = 0.5,
+    legend.key.size = unit(.5, "cm"),
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(size = 10),
+    legend.margin = margin(),
+    # Increase size and horizontal alignment of the both the title and subtitle
+    plot.title = element_text(size = 20, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+
+mapa_murici
+
+```
